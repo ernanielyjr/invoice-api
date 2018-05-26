@@ -1,34 +1,36 @@
-
-import jwt = require("jsonwebtoken");
-
+import * as jwt from 'jsonwebtoken';
+import { NextFunction, Request, Response } from 'express';
 import Config from '../config/configs';
 
 class Auth {
 
-    constructor() { }
+  constructor() { }
 
-    validate(req, res, next) {
+  validate(req: Request, res: Response, next: NextFunction) {
+    const token: string = req.body.token || req.query.token || req.headers['x-access-token'];
 
-        var token = req.body.token || req.query.token || req.headers['x-access-token'];
-
-        if (token) {
-            jwt.verify(token, Config.secret, function (err, decoded) {
-                if (err) {
-                    return res.json({ success: false, message: 'Falha ao tentar autenticar o token!' });
-                } else {
-
-                    console.log('OK')
-                    next();
-                }
-            });
+    if (token) {
+      jwt.verify(token, Config.secret, (err, decoded) => {
+        if (err) {
+          res.status(401).json({
+            // TODO: Criar objeto de erro
+            success: false,
+            message: '401 - Unauthorized'
+          });
         } else {
-            console.log('403')
-            return res.status(403).send({
-                success: false,
-                message: '403 - Forbidden'
-            });
+          next();
         }
+      });
+
+    } else {
+      res.status(403).send({
+        // TODO: Criar objeto de erro
+        success: false,
+        message: '403 - Forbidden'
+      });
     }
+  }
+
 }
 
 export default new Auth;

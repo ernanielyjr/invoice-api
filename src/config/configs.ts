@@ -1,5 +1,5 @@
 class Configs {
-    secret: string = 'developer developer developer';
+  secret: string = 'developer developer developer';
 }
 
 export default new Configs;

@@ -4,7 +4,7 @@
   "description": "",
   "main": "src/server.js",
   "scripts": {
-    "compile": "tsc -w",
+    "compile": "tslint --project ./ && tsc -w",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon ./dist/server.js"
   },
@@ -31,11 +31,13 @@
     "@types/http-status": "^0.2.30",
     "@types/mongoose": "^4.7.23",
     "@types/morgan": "^1.7.33",
-    "@types/node": "^6.0.52",
+    "@types/node": "^10.1.2",
     "jwt-simple": "^0.5.1",
     "passport": "^0.4.0",
     "passport-jwt": "^3.0.0",
     "ts-node": "^1.7.2",
+    "tslint": "^5.10.0",
+    "tslint-config-airbnb": "^5.9.2",
     "typescript": "^2.0.6"
   }
 }
