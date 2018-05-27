@@ -11,6 +11,8 @@ export enum ErrorMessages {
   AUTH_MISSING_TOKEN = 'AUTH_MISSING_TOKEN',
 
   USER_NOT_FOUND = 'USER_NOT_FOUND',
+
+  CUSTOMER_NOT_FOUND = 'CUSTOMER_NOT_FOUND',
 }
 
 export class ResponseError {

@@ -1,5 +1,6 @@
 import AuthRoutes from './api/auth/auth.routes';
 import UserRoutes from './api/user/user.routes';
+import CustomerRoutes from './api/customer/customer.routes';
 
 class Routes {
   public config(app): void {
@@ -7,6 +8,7 @@ class Routes {
 
     AuthRoutes.config(app);
     UserRoutes.config(app);
+    CustomerRoutes.config(app);
   }
 
 }
