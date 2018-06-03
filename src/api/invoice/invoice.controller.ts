@@ -9,7 +9,7 @@ class InvoiceController {
       new ResponseOk(res, invoices || []);
 
     }).catch((err) => {
-      console.error('CUSTOMER_GET_ERROR', err, req.body);
+      console.error('INVOICE_GET_ERROR', err, req.body);
       new ResponseError(res, ErrorMessages.GENERIC_ERROR);
     });
   }
@@ -21,11 +21,11 @@ class InvoiceController {
       if (invoice) {
         new ResponseOk(res, invoice);
       } else {
-        new ResponseError(res, ErrorMessages.CUSTOMER_NOT_FOUND);
+        new ResponseError(res, ErrorMessages.INVOICE_NOT_FOUND);
       }
 
     }).catch((err) => {
-      console.error('CUSTOMER_GET_BY_ID_ERROR', err, req.body);
+      console.error('INVOICE_GET_BY_ID_ERROR', err, req.body);
       new ResponseError(res, ErrorMessages.GENERIC_ERROR);
     });
   }
@@ -35,7 +35,7 @@ class InvoiceController {
       new ResponseOk(res, invoice, httpStatus.CREATED);
 
     }).catch((err) => {
-      console.error('CUSTOMER_CREATE_ERROR', err, req.body);
+      console.error('INVOICE_CREATE_ERROR', err, req.body);
       new ResponseError(res, ErrorMessages.GENERIC_ERROR);
     });
   }
@@ -47,11 +47,11 @@ class InvoiceController {
       if (invoice) {
         new ResponseOk(res, invoice);
       } else {
-        new ResponseError(res, ErrorMessages.CUSTOMER_NOT_FOUND);
+        new ResponseError(res, ErrorMessages.INVOICE_NOT_FOUND);
       }
 
     }).catch((err) => {
-      console.error('CUSTOMER_CREATE_ERROR', err, req.body);
+      console.error('INVOICE_CREATE_ERROR', err, req.body);
       new ResponseError(res, ErrorMessages.GENERIC_ERROR);
     });
   }
@@ -63,11 +63,11 @@ class InvoiceController {
       if (invoice) {
         new ResponseOk(res, null, httpStatus.NO_CONTENT);
       } else {
-        new ResponseError(res, ErrorMessages.CUSTOMER_NOT_FOUND);
+        new ResponseError(res, ErrorMessages.INVOICE_NOT_FOUND);
       }
 
     }).catch((err) => {
-      console.error('CUSTOMER_DELETE_ERROR', err, req.body);
+      console.error('INVOICE_DELETE_ERROR', err, req.body);
       new ResponseError(res, ErrorMessages.GENERIC_ERROR);
     });
   }

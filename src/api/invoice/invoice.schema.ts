@@ -1,4 +1,5 @@
 import * as mongoose from 'mongoose';
+import PostingSchema from '../posting/posting.schema';
 
 export default new mongoose.Schema({
   _customerId: mongoose.Schema.Types.ObjectId,
@@ -6,9 +7,6 @@ export default new mongoose.Schema({
   paid: Boolean,
   month: Number,
   year: Number,
-  postings: [{
-    description: String,
-    amount: mongoose.Schema.Types.Decimal128,
-  }]
+  postings: [PostingSchema]
 
 }, { versionKey: false });

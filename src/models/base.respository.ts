@@ -2,19 +2,18 @@ import * as mongoose from 'mongoose';
 
 export default class BaseRepository {
   public model: mongoose.Model<any>;
+  public subDocName;
 
-  constructor(model: mongoose.Model<any>) {
+  constructor(model: mongoose.Model<any>, subDocName?: string) {
     this.model = model;
+    this.subDocName = subDocName;
   }
 
   public filterInputData(data) {
     return data;
   }
 
-  public filterOutputData(data) {
-    return data;
-  }
-
+  // region CRUD
   public create(data) {
     const newData = this.filterInputData(data);
     return this.model.create(newData);
@@ -35,5 +34,64 @@ export default class BaseRepository {
   public delete(id) {
     return this.model.findByIdAndRemove(id);
   }
+  // endregion
+
+  // region CRUD SubDoc
+  createSubDoc(docId, subDocData) {
+    if (!this.subDocName) { throw('SUB_DOC_NAME_MISSING'); }
+
+    const newData = this.filterInputData(subDocData);
+
+    return this.model.findOneAndUpdate({
+      _id: docId
+    }, {
+      $push: {
+        [`${this.subDocName}.$`]: newData
+      }
+    });
+  }
+
+  getSubDoc(docId, subDocId?) {
+    if (!this.subDocName) { throw('SUB_DOC_NAME_MISSING'); }
+
+    if (subDocId) {
+      return this.model.findOne({
+        _id: docId,
+        [`${this.subDocName}._id`]: subDocId
+      })[this.subDocName];
+    }
+
+    return this.get(docId)[this.subDocName];
+  }
+
+  updateSubDoc(docId, subDocId, subDocData) {
+    if (!this.subDocName) { throw('SUB_DOC_NAME_MISSING'); }
+
+    const newData = this.filterInputData(subDocData);
+
+    return this.model.findOneAndUpdate({
+      _id: docId,
+      [`${this.subDocName}._id`]: subDocId
+    }, {
+      $set: {
+        [`${this.subDocName}.$`]: newData
+      }
+    });
+  }
+
+  deleteSubDoc(docId, subDocId) {
+    if (!this.subDocName) { throw('SUB_DOC_NAME_MISSING'); }
+
+    return this.model.findOneAndUpdate({
+      _id: docId
+    }, {
+      $pull: {
+        [`${this.subDocName}.$`]: {
+          _id: subDocId
+        }
+      },
+    });
+  }
+  // endregion
 
 }

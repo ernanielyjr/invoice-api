@@ -13,6 +13,10 @@ export enum ErrorMessages {
   USER_NOT_FOUND = 'USER_NOT_FOUND',
 
   CUSTOMER_NOT_FOUND = 'CUSTOMER_NOT_FOUND',
+
+  INVOICE_NOT_FOUND = 'INVOICE_NOT_FOUND',
+
+  POSTING_NOT_FOUND = 'POSTING_NOT_FOUND',
 }
 
 export class ResponseError {
