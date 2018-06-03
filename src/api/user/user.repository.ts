@@ -18,8 +18,9 @@ class UserRepository extends BaseRepository {
     };
   }
 
-  findWithPassword(user) {
-    return this.model.findOne(user);
+  findWithPassword(data) {
+    const newData = this.filterInputData(data);
+    return this.model.findOne(newData);
   }
 
 }
