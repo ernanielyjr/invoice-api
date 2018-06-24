@@ -7,7 +7,10 @@ class DatabaseService {
   constructor() { }
 
   createConnection() {
-    mongoose.connect(AppConfig.database.uri);
+    (<any>mongoose).Promise = global.Promise;
+    mongoose.connect(AppConfig.database.uri, {
+      useMongoClient: true
+    });
     this.logger();
   }
 

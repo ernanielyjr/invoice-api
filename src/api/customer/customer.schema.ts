@@ -23,4 +23,7 @@ export default new mongoose.Schema({
 
   notes: [String],
 
-}, { versionKey: false });
+}, {
+  usePushEach: true,
+  versionKey: false
+});
