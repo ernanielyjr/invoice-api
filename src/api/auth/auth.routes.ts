@@ -6,7 +6,6 @@ class AuthRoutes {
   public config(app): void {
     app.route('/api/v1/authenticate').post(AuthController.login);
   }
-
 }
 
 export default new AuthRoutes;

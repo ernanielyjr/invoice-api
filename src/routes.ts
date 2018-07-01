@@ -3,6 +3,7 @@ import UserRoutes from './api/user/user.routes';
 import CustomerRoutes from './api/customer/customer.routes';
 import InvoiceRoutes from './api/invoice/invoice.routes';
 import PostingRoutes from './api/posting/posting.routes';
+import ServiceRoutes from './api/service/service.routes';
 
 class Routes {
   public config(app): void {
@@ -13,6 +14,7 @@ class Routes {
     CustomerRoutes.config(app);
     InvoiceRoutes.config(app);
     PostingRoutes.config(app);
+    ServiceRoutes.config(app);
   }
 
 }

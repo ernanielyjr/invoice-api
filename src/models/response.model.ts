@@ -17,6 +17,8 @@ export enum ErrorMessages {
   INVOICE_NOT_FOUND = 'INVOICE_NOT_FOUND',
 
   POSTING_NOT_FOUND = 'POSTING_NOT_FOUND',
+
+  SERVICE_NOT_FOUND = 'SERVICE_NOT_FOUND',
 }
 
 export class ResponseError {

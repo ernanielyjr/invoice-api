@@ -8,7 +8,6 @@ class PostingRoutes {
     app.route('/api/v1/invoice/:invoiceId/posting/:id').put(PostingController.update);
     app.route('/api/v1/invoice/:invoiceId/posting/:id').delete(PostingController.delete);
   }
-
 }
 
 export default new PostingRoutes;

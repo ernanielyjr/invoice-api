@@ -8,7 +8,6 @@ class UserRoutes {
     app.route('/api/v1/user/:id').put(UserController.update);
     app.route('/api/v1/user/:id').delete(UserController.delete);
   }
-
 }
 
 export default new UserRoutes;

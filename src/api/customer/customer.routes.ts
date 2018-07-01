@@ -8,7 +8,6 @@ class CustomerRoutes {
     app.route('/api/v1/customer/:id').put(CustomerController.update);
     app.route('/api/v1/customer/:id').delete(CustomerController.delete);
   }
-
 }
 
 export default new CustomerRoutes;

@@ -8,7 +8,6 @@ class InvoiceRoutes {
     app.route('/api/v1/invoice/:id').put(InvoiceController.update);
     app.route('/api/v1/invoice/:id').delete(InvoiceController.delete);
   }
-
 }
 
 export default new InvoiceRoutes;
