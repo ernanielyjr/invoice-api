@@ -9,6 +9,12 @@ class ServiceRepository extends BaseRepository {
     super(mongoose.model('Service', ServiceSchema));
   }
 
+  listByCustomer(customerId) {
+    return this.model.find({
+      _customerId: customerId
+    });
+  }
+
 }
 
 export default new ServiceRepository;

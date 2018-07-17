@@ -1,5 +1,7 @@
 import { ErrorMessages, ResponseError, ResponseOk, httpStatus } from '../../models/response.model';
 import CustomerRepository from './customer.repository';
+import ServiceRepository from '../service/service.repository';
+import InvoiceRepository from '../invoice/invoice.repository';
 
 class CustomerController {
   constructor() { }
@@ -26,6 +28,45 @@ class CustomerController {
 
     }).catch((err) => {
       console.error('CUSTOMER_GET_BY_ID_ERROR', err, req.body);
+      new ResponseError(res, ErrorMessages.GENERIC_ERROR);
+    });
+  }
+
+  listServices(req, res) {
+    const { customerId } = req.params;
+
+    ServiceRepository.listByCustomer(customerId).then((services) => {
+      new ResponseOk(res, services || []);
+
+    }).catch((err) => {
+      console.error('SERVICES_LIST_BY_CUSTOMER_ERROR', err, req.body);
+      new ResponseError(res, ErrorMessages.GENERIC_ERROR);
+    });
+  }
+
+  listInvoices(req, res) {
+    const { customerId } = req.params;
+
+    InvoiceRepository.getByCustomer(customerId).then((invoices) => {
+      new ResponseOk(res, invoices || []);
+
+    }).catch((err) => {
+      console.error('INVOICES_LIST_BY_CUSTOMER_ERROR', err, req.body);
+      new ResponseError(res, ErrorMessages.GENERIC_ERROR);
+    });
+  }
+
+  currentInvoice(req, res) {
+    const { customerId } = req.params;
+    const baseDate = new Date();
+    const baseMonth = baseDate.getMonth() + 1;
+    const baseYear = baseDate.getFullYear();
+
+    InvoiceRepository.getByCompetenceDate(customerId, baseMonth, baseYear).then((currentInvoice) => {
+      new ResponseOk(res, currentInvoice);
+
+    }).catch((err) => {
+      console.error('SERVICES_LIST_BY_CUSTOMER_ERROR', err, req.body);
       new ResponseError(res, ErrorMessages.GENERIC_ERROR);
     });
   }

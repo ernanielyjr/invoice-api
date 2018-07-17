@@ -3,6 +3,7 @@ import InvoiceController from './invoice.controller';
 class InvoiceRoutes {
   public config(app): void {
     app.route('/api/v1/invoice').get(InvoiceController.get);
+    app.route('/api/v1/invoice/close').get(InvoiceController.closeAllInvoices);
     app.route('/api/v1/invoice/:id').get(InvoiceController.getById);
     app.route('/api/v1/invoice').post(InvoiceController.create);
     app.route('/api/v1/invoice/:id').put(InvoiceController.update);

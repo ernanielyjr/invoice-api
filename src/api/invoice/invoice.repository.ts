@@ -9,6 +9,20 @@ class InvoiceRepository extends BaseRepository {
     super(mongoose.model('Invoice', InvoiceSchema));
   }
 
+  getByCustomer(customerId: String) {
+    return this.model.find({
+      _customerId: customerId,
+    });
+  }
+
+  getByCompetenceDate(customerId: String, month: Number, year: Number) {
+    return this.model.findOne({
+      month,
+      year,
+      _customerId: customerId,
+    });
+  }
+
 }
 
 export default new InvoiceRepository;

@@ -9,7 +9,7 @@ export default new mongoose.Schema({
   documentType: String,
   responsibleName: String,
 
-  invoitceMaturiry: Number,
+  invoitceMaturiry: Number, // FIXME: mudar para invoitceMaturity
 
   address: {
     street: String,

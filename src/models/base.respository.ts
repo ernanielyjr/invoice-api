@@ -10,29 +10,33 @@ export default class BaseRepository {
     this.subDocName = subDocName;
   }
 
-  public filterInputData(data) {
+  filterInputData(data) {
     return data;
   }
 
   // region CRUD
-  public create(data) {
+  create(data) {
     const newData = this.filterInputData(data);
     return this.model.create(newData);
   }
 
-  public get(id?) {
+  find(query) {
+    return this.model.find(query);
+  }
+
+  get(id?) {
     if (!id) {
       return this.model.find();
     }
     return this.model.findById(id);
   }
 
-  public update(id, data) {
+  update(id, data) {
     const updateData = (<any>Object).assign({}, this.filterInputData(data));
     return this.model.findByIdAndUpdate(id, updateData, { new: true });
   }
 
-  public delete(id) {
+  delete(id) {
     return this.model.findByIdAndRemove(id);
   }
   // endregion
