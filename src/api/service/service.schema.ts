@@ -30,7 +30,9 @@ export default new mongoose.Schema({
     type: Boolean,
     default: false
   },
+
 }, {
+  timestamps: true,
   usePushEach: true,
   versionKey: false
 });

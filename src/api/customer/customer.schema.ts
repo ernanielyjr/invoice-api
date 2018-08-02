@@ -24,6 +24,7 @@ export default new mongoose.Schema({
   notes: [String],
 
 }, {
+  timestamps: true,
   usePushEach: true,
   versionKey: false
 });

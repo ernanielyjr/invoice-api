@@ -14,3 +14,10 @@ serviço de fechar/criar a fatura
 
 
 criar endpoint que verifica se o cliente esta em atraso e faz bloqueio do serviço
+
+
+fechar fatura
+realizar lançamentos (debito/credito)
+pagar fatura (pagseguro)
+checar status de bloqueio
+endpoint de notificação do pagseguro

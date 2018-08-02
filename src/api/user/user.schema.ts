@@ -5,6 +5,7 @@ export default new mongoose.Schema({
   password: { type: String },
 
 }, {
+  timestamps: true,
   usePushEach: true,
   versionKey: false
 });

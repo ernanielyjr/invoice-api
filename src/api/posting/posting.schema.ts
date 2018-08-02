@@ -1,4 +1,5 @@
 import * as mongoose from 'mongoose';
+import PostingType from '../../models/posting-type.enum.1';
 
 export default new mongoose.Schema({
   _serviceId: {
@@ -6,10 +7,16 @@ export default new mongoose.Schema({
     ref: 'Service',
     required: false
   },
+  type: {
+    type: String,
+    enum: Object.keys(PostingType),
+    required: [true, 'service.postings.type.required']
+  },
   description: String,
   amount: Number,
 
 }, {
+  timestamps: true,
   usePushEach: true,
   versionKey: false
 });

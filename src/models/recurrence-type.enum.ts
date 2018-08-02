@@ -1,7 +1,7 @@
 enum RecurrenceType {
-  daily = 'daily',
-  monthly = 'monthly',
-  annually = 'annually',
+  monthly   = 'monthly',
+  quarterly = 'quarterly',
+  yearly    = 'yearly',
 }
 
 export default RecurrenceType;

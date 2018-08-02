@@ -19,9 +19,11 @@ export default new mongoose.Schema({
     minlength: 4,
     required: [true, 'invoice.year.required']
   },
+  amount: Number,
   postings: [PostingSchema]
 
 }, {
+  timestamps: true,
   usePushEach: true,
   versionKey: false
 });
