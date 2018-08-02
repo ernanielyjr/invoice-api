@@ -3,7 +3,7 @@ import { ObjectID } from 'bson';
 
 export default class BaseRepository {
   public model: mongoose.Model<any>;
-  public subDocName;
+  public subDocName: string;
 
   constructor(model: mongoose.Model<any>, subDocName?: string) {
     this.model = model;
@@ -21,23 +21,23 @@ export default class BaseRepository {
   }
 
   find(query) {
-    return this.model.find(query);
+    return this.model.find(query).exec();
   }
 
   get(id?) {
     if (!id) {
-      return this.model.find();
+      return this.model.find().exec();
     }
-    return this.model.findById(id);
+    return this.model.findById(id).exec();
   }
 
   update(id, data) {
     const updateData = (<any>Object).assign({}, this.filterInputData(data));
-    return this.model.findByIdAndUpdate(id, updateData, { new: true });
+    return this.model.findByIdAndUpdate(id, updateData, { new: true }).exec();
   }
 
   delete(id) {
-    return this.model.findByIdAndRemove(id);
+    return this.model.findByIdAndRemove(id).exec();
   }
   // endregion
 

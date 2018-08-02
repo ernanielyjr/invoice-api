@@ -1,41 +1,20 @@
-import { ErrorMessages, ResponseError, ResponseOk, httpStatus } from '../../models/response.model';
-import CustomerRepository from './customer.repository';
-import ServiceRepository from '../service/service.repository';
+import { Request, Response } from 'express';
+import CrudController from '../../models/crud.controller';
+import { ErrorMessages, ResponseError, ResponseOk } from '../../models/response.model';
 import InvoiceRepository from '../invoice/invoice.repository';
+import ServiceRepository from '../service/service.repository';
+import CustomerRepository from './customer.repository';
 
-class CustomerController {
-  constructor() { }
+class CustomerController extends CrudController {
 
-  get(req, res) {
-    CustomerRepository.get().then((customers) => {
-      new ResponseOk(res, customers || []);
-
-    }).catch((err) => {
-      console.error('CUSTOMER_GET_ERROR', err, req.body);
-      new ResponseError(res, ErrorMessages.GENERIC_ERROR);
-    });
+  constructor() {
+    super(CustomerRepository);
   }
 
-  getById(req, res) {
+  listServices(req: Request, res: Response) {
     const { id } = req.params;
 
-    CustomerRepository.get(id).then((customer) => {
-      if (customer) {
-        new ResponseOk(res, customer);
-      } else {
-        new ResponseError(res, ErrorMessages.CUSTOMER_NOT_FOUND);
-      }
-
-    }).catch((err) => {
-      console.error('CUSTOMER_GET_BY_ID_ERROR', err, req.body);
-      new ResponseError(res, ErrorMessages.GENERIC_ERROR);
-    });
-  }
-
-  listServices(req, res) {
-    const { customerId } = req.params;
-
-    ServiceRepository.listByCustomer(customerId).then((services) => {
+    ServiceRepository.listByCustomer(id).then((services) => {
       new ResponseOk(res, services || []);
 
     }).catch((err) => {
@@ -44,10 +23,10 @@ class CustomerController {
     });
   }
 
-  listInvoices(req, res) {
-    const { customerId } = req.params;
+  listInvoices(req: Request, res: Response) {
+    const { id } = req.params;
 
-    InvoiceRepository.getByCustomer(customerId).then((invoices) => {
+    InvoiceRepository.getByCustomer(id).then((invoices) => {
       new ResponseOk(res, invoices || []);
 
     }).catch((err) => {
@@ -56,59 +35,17 @@ class CustomerController {
     });
   }
 
-  currentInvoice(req, res) {
-    const { customerId } = req.params;
+  currentInvoice(req: Request, res: Response) {
+    const { id } = req.params;
     const baseDate = new Date();
     const baseMonth = baseDate.getMonth() + 1;
     const baseYear = baseDate.getFullYear();
 
-    InvoiceRepository.getByCompetenceDate(customerId, baseMonth, baseYear).then((currentInvoice) => {
+    InvoiceRepository.getByCompetenceDate(id, baseMonth, baseYear).then((currentInvoice) => {
       new ResponseOk(res, currentInvoice);
 
     }).catch((err) => {
       console.error('SERVICES_LIST_BY_CUSTOMER_ERROR', err, req.body);
-      new ResponseError(res, ErrorMessages.GENERIC_ERROR);
-    });
-  }
-
-  create(req, res) {
-    CustomerRepository.create(req.body).then((customer) => {
-      new ResponseOk(res, customer, httpStatus.CREATED);
-
-    }).catch((err) => {
-      console.error('CUSTOMER_CREATE_ERROR', err, req.body);
-      new ResponseError(res, ErrorMessages.GENERIC_ERROR);
-    });
-  }
-
-  update(req, res) {
-    const { id } = req.params;
-
-    CustomerRepository.update(id, req.body).then((customer) => {
-      if (customer) {
-        new ResponseOk(res, customer);
-      } else {
-        new ResponseError(res, ErrorMessages.CUSTOMER_NOT_FOUND);
-      }
-
-    }).catch((err) => {
-      console.error('CUSTOMER_CREATE_ERROR', err, req.body);
-      new ResponseError(res, ErrorMessages.GENERIC_ERROR);
-    });
-  }
-
-  delete(req, res) {
-    const { id } = req.params;
-
-    CustomerRepository.delete(id).then((customer) => {
-      if (customer) {
-        new ResponseOk(res, null, httpStatus.NO_CONTENT);
-      } else {
-        new ResponseError(res, ErrorMessages.CUSTOMER_NOT_FOUND);
-      }
-
-    }).catch((err) => {
-      console.error('CUSTOMER_DELETE_ERROR', err, req.body);
       new ResponseError(res, ErrorMessages.GENERIC_ERROR);
     });
   }

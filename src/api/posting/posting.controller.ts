@@ -23,7 +23,7 @@ class PostingController {
       if (posting) {
         new ResponseOk(res, posting);
       } else {
-        new ResponseError(res, ErrorMessages.POSTING_NOT_FOUND);
+        new ResponseError(res, ErrorMessages.ITEM_NOT_FOUND);
       }
 
     }).catch((err) => {
@@ -51,7 +51,7 @@ class PostingController {
       if (posting) {
         new ResponseOk(res, posting);
       } else {
-        new ResponseError(res, ErrorMessages.POSTING_NOT_FOUND);
+        new ResponseError(res, ErrorMessages.ITEM_NOT_FOUND);
       }
 
     }).catch((err) => {
@@ -67,7 +67,7 @@ class PostingController {
       if (posting) {
         new ResponseOk(res, null, httpStatus.NO_CONTENT);
       } else {
-        new ResponseError(res, ErrorMessages.POSTING_NOT_FOUND);
+        new ResponseError(res, ErrorMessages.ITEM_NOT_FOUND);
       }
 
     }).catch((err) => {

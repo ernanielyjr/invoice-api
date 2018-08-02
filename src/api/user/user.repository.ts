@@ -9,6 +9,13 @@ class UserRepository extends BaseRepository {
     super(mongoose.model('User', UserSchema));
   }
 
+  get(id?) {
+    if (!id) {
+      return this.model.find().select('-password').exec();
+    }
+    return this.model.findById(id).select('-password').exec();
+  }
+
   public filterInputData(user) {
     const { username, password } = user;
     const passwordEncrypted = AuthService.sha512(password);

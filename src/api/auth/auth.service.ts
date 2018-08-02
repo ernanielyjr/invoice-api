@@ -9,13 +9,13 @@ class AuthService {
 
   constructor() { }
 
-  sha512(password) {
+  sha512(password: string) {
     const hash = crypto.createHmac('sha512', AppConfig.passKey);
     hash.update(password);
     return hash.digest('hex');
   }
 
-  sign(userId) {
+  sign(userId: string) {
     return jwt.sign({ id: userId }, AppConfig.jwt.secret, {
       expiresIn: AppConfig.jwt.expiration
     });
