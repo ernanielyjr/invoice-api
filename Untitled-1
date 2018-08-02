@@ -1,0 +1,19 @@
+quando tu gerar a fatura de abril, digamos que ela tenha dado -1000
+
+tu vai atribuir isso como um lançamento na fatura de maio, por óbvio, proque a de abril tu já fechou
+
+aí o cara vai lá e paga os 1000
+
+aí tu tem, na fatura de maio, o lançcamento de -1000 e +1000
+se por acaso o vivente pagar pra mais ou pra menos, esse saldo vai ficar pro próximo mês, sempre que rodar o processo de fechamento
+
+ou seja, o processo de fechamento soma tudo, e faz um lançamento do restante na próxima fatura (seja o restante positivo ou negativo)
+
+acredito que apenas na hora do processo de fechamento
+tu possa gravar no nivel da fatura
+o saldo final
+
+fecharFatura{
+  this.amount = somaPostings();
+  registraAmoutDestaFaturaNaProxima(this.amount);
+}
