@@ -1,5 +1,5 @@
 import * as mongoose from 'mongoose';
-import PostingType from '../../models/posting-type.enum.1';
+import PostingType from '../../models/posting-type.enum';
 
 export default new mongoose.Schema({
   _serviceId: {

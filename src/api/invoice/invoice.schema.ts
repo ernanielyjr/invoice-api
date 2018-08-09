@@ -20,7 +20,8 @@ export default new mongoose.Schema({
     required: [true, 'invoice.year.required']
   },
   amount: Number,
-  postings: [PostingSchema]
+  postings: [PostingSchema],
+  paymentCode: String,
 
 }, {
   timestamps: true,

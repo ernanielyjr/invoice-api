@@ -1,5 +1,6 @@
+import { Request, Response } from 'express';
 import CrudController from '../../models/crud.controller';
-import PostingType from '../../models/posting-type.enum.1';
+import PostingType from '../../models/posting-type.enum';
 import { ErrorMessages, httpStatus, ResponseError, ResponseOk } from '../../models/response.model';
 import CustomerRepository from '../customer/customer.repository';
 import ServiceRepository from '../service/service.repository';
@@ -11,7 +12,7 @@ class InvoiceController extends CrudController {
     super(InvoiceRepository);
   }
 
-  async closeAllInvoices(req, res) {
+  async closeAllInvoices(req: Request, res: Response) {
     try {
       // UNDO: const today = new Date();
       const today = new Date(2018, 9 - 1, 30);

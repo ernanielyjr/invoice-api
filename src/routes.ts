@@ -3,6 +3,7 @@ import AuthRoutes from './api/auth/auth.routes';
 import CustomerRoutes from './api/customer/customer.routes';
 import EmailRoutes from './api/email/email.routes';
 import InvoiceRoutes from './api/invoice/invoice.routes';
+import PaymentRoutes from './api/payment/payment.routes';
 import PostingRoutes from './api/posting/posting.routes';
 import ServiceRoutes from './api/service/service.routes';
 import UserRoutes from './api/user/user.routes';
@@ -15,6 +16,7 @@ class Routes {
     CustomerRoutes.config(app);
     EmailRoutes.config(app);
     InvoiceRoutes.config(app);
+    PaymentRoutes.config(app);
     PostingRoutes.config(app);
     ServiceRoutes.config(app);
     UserRoutes.config(app);

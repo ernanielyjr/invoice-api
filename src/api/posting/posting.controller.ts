@@ -1,10 +1,11 @@
-import { ErrorMessages, ResponseError, ResponseOk, httpStatus } from '../../models/response.model';
+import { Request, Response } from 'express';
+import { ErrorMessages, httpStatus, ResponseError, ResponseOk } from '../../models/response.model';
 import PostingRepository from './posting.repository';
 
 class PostingController {
   constructor() { }
 
-  get(req, res) {
+  get(req: Request, res: Response) {
     const { invoiceId } = req.params;
 
     PostingRepository.getSubDoc(invoiceId).then((postings) => {
@@ -16,7 +17,7 @@ class PostingController {
     });
   }
 
-  getById(req, res) {
+  getById(req: Request, res: Response) {
     const { invoiceId, id } = req.params;
 
     PostingRepository.getSubDoc(invoiceId, id).then((posting) => {
@@ -32,7 +33,7 @@ class PostingController {
     });
   }
 
-  create(req, res) {
+  create(req: Request, res: Response) {
     const { invoiceId } = req.params;
 
     PostingRepository.createSubDoc(invoiceId, req.body).then((posting) => {
@@ -44,7 +45,7 @@ class PostingController {
     });
   }
 
-  update(req, res) {
+  update(req: Request, res: Response) {
     const { invoiceId, id } = req.params;
 
     PostingRepository.updateSubDoc(invoiceId, id, req.body).then((posting) => {
@@ -60,7 +61,7 @@ class PostingController {
     });
   }
 
-  delete(req, res) {
+  delete(req: Request, res: Response) {
     const { invoiceId, id } = req.params;
 
     PostingRepository.deleteSubDoc(invoiceId, id).then((posting) => {
