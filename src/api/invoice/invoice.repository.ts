@@ -9,6 +9,13 @@ class InvoiceRepository extends BaseRepository {
     super(mongoose.model('Invoice', InvoiceSchema));
   }
 
+  getOpenedByCustomer(customerId: String) {
+    return this.model.findOne({
+      _customerId: customerId,
+      closed: true,
+    });
+  }
+
   getByCustomer(customerId: String) {
     return this.model.find({
       _customerId: customerId,

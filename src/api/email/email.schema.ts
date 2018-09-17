@@ -17,6 +17,19 @@ export default new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  response: {
+    accepted: [String],
+    rejected: [],
+    envelopeTime: Number,
+    messageTime: Number,
+    messageSize: Number,
+    response: String,
+    envelope: {
+      from: String,
+      to: [String]
+    },
+    messageId: String
+  }
 
 }, {
   timestamps: true,

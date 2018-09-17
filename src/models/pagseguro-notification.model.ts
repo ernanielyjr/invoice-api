@@ -61,10 +61,6 @@ $shippingType[1] = 'Encomenda normal (PAC)';
 $shippingType[2] = 'SEDEX';
 $shippingType[3] = 'Tipo de frete não especificado';
 
-export interface PagSeguroNotification {
-  transaction: Transaction;
-}
-
 interface Transaction {
   date: string;
   lastEventDate: string;
@@ -142,6 +138,10 @@ interface Transaction {
   primaryReceiver?: {
     publicKey: string
   };
+}
+
+export interface PagSeguroNotification {
+  transaction: Transaction;
 }
 
 export const transactionType = $transactionType;

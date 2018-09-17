@@ -33,11 +33,12 @@ export class PaymentService {
 
   addItem(description: string, amount: number): void {
     const { obj } = this.paymentProvider;
+    const items = obj.items || [];
 
     this.paymentProvider.addItem({
       description,
       amount: Math.abs(amount).toFixed(2),
-      id: obj.items.length + 1,
+      id: items.length + 1,
       quantity: 1,
     });
   }
@@ -76,7 +77,7 @@ export class PaymentService {
     });
   }
 
-  static getDetail(code: string) {
+  static getDetail(code: string): Promise<DetailResponse> {
     return new Promise((resolve, reject) => {
       const { notificationUrl, email, token } = AppConfig.pagSeguro;
 
@@ -87,15 +88,20 @@ export class PaymentService {
         });
 
         response.on('end', () => {
-
           const parser = new xml2js.Parser({ explicitArray : false });
           parser.parseString(data, (parseStringError, result: PagSeguroNotification) => {
             if (parseStringError) {
               return reject(parseStringError);
             }
 
-            // TODO: retornar só o que importa, total pago, data, etc...
-            return resolve(result);
+            const { transaction } = result;
+
+            return resolve({
+              code: transaction.code,
+              reference: transaction.reference,
+              status: transaction.status,
+              amount: transaction.grossAmount,
+            });
           });
         });
 
@@ -104,4 +110,11 @@ export class PaymentService {
       });
     });
   }
+}
+
+interface DetailResponse {
+  code: string;
+  reference: string;
+  status: number;
+  amount: number;
 }

@@ -4,11 +4,19 @@ const {
   dbHost,
   dbPort,
   dbName,
+  adminEmail,
+  emailBaseUrl,
+  smtpService,
+  smtpUser,
+  smtpPass,
+  smtpName,
+  smtpEmail,
   appPassKey,
   jwtSecret,
   pagSeguroEmail,
   pagSeguroToken,
   pagSeguroMode,
+  pagSeguroNotificationUrl
 } = process.env;
 
 class Database {
@@ -23,6 +31,15 @@ class Database {
 }
 
 class AppConfig {
+  adminEmail = adminEmail || 'ernani.gauti@gmail.com';
+  emailBaseUrl = emailBaseUrl || 'http://localhost/';
+  smtp = {
+    service: smtpService || 'gmail',
+    user: smtpUser || 'ernani@gauti.com.br',
+    pass: smtpPass || 'dnjmtumucmuxbuey',
+    name: smtpName || 'Financeiro - Gauti',
+    email: smtpEmail || 'financeiro@gauti.com.br'
+  };
   passKey = appPassKey || '8C1DFCE96682D7472406DF6C2F29EFD9F71E39F06EEA71DB564CBC496E4C19C6';
   database = new Database();
   jwt = {
@@ -32,8 +49,8 @@ class AppConfig {
   pagSeguro = {
     email: pagSeguroEmail || 'ernani@gauti.com.br',
     token: pagSeguroToken || '1784F9336ED8445A9487C267BE96C1E2',
-    mode: 'sandbox' as 'payment' | 'sandbox' | 'subscription',
-    notificationUrl: 'https://ws.sandbox.pagseguro.uol.com.br/v3/transactions/notifications'
+    mode: (pagSeguroMode || 'sandbox') as 'payment' | 'sandbox' | 'subscription',
+    notificationUrl: pagSeguroNotificationUrl || 'https://ws.sandbox.pagseguro.uol.com.br/v3/transactions/notifications'
   };
 }
 

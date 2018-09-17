@@ -3,6 +3,7 @@ import CrudController from '../../models/crud.controller';
 import PostingType from '../../models/posting-type.enum';
 import { ErrorMessages, httpStatus, ResponseError, ResponseOk } from '../../models/response.model';
 import CustomerRepository from '../customer/customer.repository';
+import EmailService from '../email/email.service';
 import ServiceRepository from '../service/service.repository';
 import InvoiceRepository from './invoice.repository';
 
@@ -12,13 +13,89 @@ class InvoiceController extends CrudController {
     super(InvoiceRepository);
   }
 
-  async closeAllInvoices(req: Request, res: Response) {
+  private generateNextInvoice(year: number, month: number, day: number, customerId: string, amount: number = 0) {
+    return new Promise(async (resolve, reject) => {
+
+      const nextInvoiceDate = new Date(year, month, 1);
+      const nextInvoice = {
+        day,
+        month: nextInvoiceDate.getMonth() + 1,
+        year: nextInvoiceDate.getFullYear(),
+        _customerId: customerId,
+        closed: false,
+        postings: []
+      };
+
+      nextInvoice.postings.push({
+        amount,
+        type: PostingType.balance,
+        description: 'Saldo da Fatura Anterior',
+      });
+
+      const customerServices = await ServiceRepository.find({
+        _customerId: customerId,
+        inactive: false
+      });
+
+      customerServices.forEach((service) => {
+        // TODO: check recurrency
+        nextInvoice.postings.push({
+          _serviceId: service._id,
+          type: PostingType.service,
+          description: service.description,
+          amount: service.amount,
+        });
+      });
+
+      try {
+        const newInvoice = await InvoiceRepository.create(nextInvoice);
+        resolve(newInvoice);
+
+      } catch (err) {
+        console.error('INVOICE_OPEN_ERROR', err, nextInvoice);
+        reject(nextInvoice);
+      }
+    });
+  }
+
+  async customerFirstInvoice(req: Request, res: Response) {
     try {
-      // UNDO: const today = new Date();
-      const today = new Date(2018, 9 - 1, 30);
+      const { customerId } = req.params;
+
+      const customerInvoices = await InvoiceRepository.getByCustomer(customerId);
+      if (customerInvoices && customerInvoices.length) {
+        console.error('INVOICE_FIRST_ALREADY_EXISTS', customerId);
+        return new ResponseError(res, ErrorMessages.GENERIC_ERROR);
+      }
+
+      const today = new Date();
       const year = today.getFullYear();
       const month = today.getMonth();
 
+      const customer = await CustomerRepository.get(customerId);
+
+      if (!customer) {
+        console.error('CUSTOMER_NOT_FOUND', customerId);
+        return new ResponseError(res, ErrorMessages.GENERIC_ERROR);
+      }
+
+      const newInvoice = await this.generateNextInvoice(year, month - 1, customer.invoiceMaturity, customerId);
+      return new ResponseOk(res, newInvoice);
+
+    } catch (err) {
+      console.error('INVOICE_GENERATE_FIRST', err, req.body);
+      new ResponseError(res, ErrorMessages.GENERIC_ERROR);
+    }
+  }
+
+  async closeAllInvoices(req: Request, res: Response) {
+    try {
+      // UNDO: const today = new Date();
+      const today = new Date(2018, 8 - 1, 31);
+      const year = today.getFullYear();
+      const month = today.getMonth();
+
+      // FIXME: change to close invoice 10 day before maturity
       const closeDate = new Date(year, month + 1, 0);
 
       if (today.getTime() !== closeDate.getTime()) {
@@ -51,14 +128,14 @@ class InvoiceController extends CrudController {
         openError: [],
       };
 
-      await invoicesList.forEach(async (invoice) => {
+      for (const invoice of invoicesList) {
         const totalIncome = invoice.postings
-        .filter(posting => posting.amount > 0 && posting.type !== PostingType.balance)
-        .reduce((sum, posting) => sum + posting.amount, 0);
+          .filter(posting => posting.amount > 0 && posting.type !== PostingType.balance)
+          .reduce((sum, posting) => sum + posting.amount, 0);
 
         let previousBalance = invoice.postings
-        .filter(posting => posting.type === PostingType.balance)
-        .reduce((sum, posting) => sum + posting.amount, 0);
+          .filter(posting => posting.type === PostingType.balance)
+          .reduce((sum, posting) => sum + posting.amount, 0);
 
         previousBalance = totalIncome + previousBalance;
 
@@ -89,47 +166,24 @@ class InvoiceController extends CrudController {
           response.closeError.push(invoice);
         }
 
-        // TODO: registrar email a ser enviado
-
-        const nextInvoiceDate = new Date(year, month + 1, 1);
-        const nextInvoice = {
-          _customerId: invoice._customerId,
-          closed: false,
-          month: nextInvoiceDate.getMonth() + 1,
-          year: nextInvoiceDate.getFullYear(),
-          postings: []
-        };
-
-        nextInvoice.postings.push({
-          type: PostingType.balance,
-          description: 'Saldo da Fatura Anterior',
-          amount: invoice.amount,
-        });
-
-        const customerServices = await ServiceRepository.find({
-          _customerId: invoice._customerId,
-          inactive: false
-        });
-
-        customerServices.forEach((service) => {
-          // TODO: check recurrency
-          nextInvoice.postings.push({
-            _serviceId: service._id,
-            type: PostingType.service,
-            description: service.description,
-            amount: service.amount,
-          });
-        });
+        const customer = await CustomerRepository.get(invoice._customerId);
+        await EmailService.invoiceClosed(customer, invoice);
 
         try {
-          const newInvoice = await InvoiceRepository.create(nextInvoice);
+          const newInvoice = await this.generateNextInvoice(
+            year,
+            month + 1,
+            customer.invoiceMaturity,
+            invoice._customerId,
+            invoice.amount
+          );
           response.opened.push(newInvoice);
 
         } catch (err) {
-          console.error('INVOICE_OPEN_ERROR', err, nextInvoice);
-          response.openError.push(nextInvoice);
+          console.error('INVOICE_OPEN_ERROR', err);
+          response.openError.push(err);
         }
-      });
+      }
 
       new ResponseOk(res, response);
 

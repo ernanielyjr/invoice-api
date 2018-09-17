@@ -1,0 +1,94 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="pt-BR">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <title><%=subject%></title>
+
+  <style type="text/css">
+  </style>
+</head>
+
+<body style="margin:0; padding:0; background-color:#F2F2F2; color: #333; font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif,'Apple Color Emoji','Segoe UI Emoji','Segoe UI Symbol','Noto Color Emoji';">
+  <center>
+    <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#F2F2F2">
+      <tr>
+        <td align="center" valign="top">
+          <table width="640" cellspacing="0" cellpadding="0" border="0" align="center" style="max-width:640px; width:100%;"
+            bgcolor="#FFFFFF">
+            <tr>
+              <td align="center" valign="top" style="padding: 10px 20px; color: #FFFFFF; background: #28a745" bgcolor="#28a745">
+                <h1 style="font-weight: 100; padding: 0; margin: 0;">
+                  GAUTI<br />
+                  <small style="font-size: 20px;">Fatura de Hospedagem</small>
+                </h1>
+              </td>
+            </tr>
+            <tr>
+              <td align="center" valign="top" style="padding: 10px 20px;">
+
+                <table width="600" cellspacing="0" cellpadding="0" border="0" align="center" style="max-width:600px; width:100%;">
+                  <tr>
+                    <td align="center" valign="top" style="padding: 10px 20px;">
+                      <h1 style="font-weight: 100;">Olá, <%=firstName%></h1>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td align="center" valign="top" style="padding: 10px 20px;">
+                      <h2 style="font-weight: 100; font-size: 20px; line-height: 28px; max-width: 340px;">
+                        Sua fatura de <b style="font-weight: normal;"><%=monthYear%></b> está fechada e disponível para
+                        pagamento!
+                      </h2>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td align="center" valign="top" style="padding: 10px 20px; line-height: 28px;">
+                      <b>Vencimento:</b> <%=dueDate%>*<br />
+                      <b>Valor:</b> R$ <%=totalAmount%>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td align="center" valign="top" style="padding: 20px;line-height: 22px;">
+                      <a style="font-size: 20px; font-weight: 100; color: #FFFFFF; text-decoration: none; min-width: 200px; border-radius: 10px; padding: 12px; box-sizing: border-box; display: inline-block; background: #28a745"
+                        href="<%=paymentLink%>" target="_blank">Pagar agora</a><br />
+                      <br />
+                      <small style="color: #999;">ou acesse o link abaixo:</small><br />
+                      <br />
+                      <code style="background-color: #F0F0F0; display: inline-block; padding: 5px 10px; border: solid 1px #EAEAEA;"><%=paymentLink%></code><br />
+                      <!-- <br />
+                      <small>{{ bandeiras_de_pagamento }}</small> -->
+                    </td>
+                  </tr>
+                  <tr>
+                    <td align="center" valign="top" style="padding: 20px;">
+                      <small style="font-size: 10px; display: inline-block; max-width: 360px; line-height: 14px;">
+                        * Excepcionalmente para o mês de setembro, o vencimento será no dia 20. A partir de outubro, o
+                        vencimento volta a ser no dia 10 de cada mês.
+                      </small><br />
+                      <br />
+                      <br />
+                      <small style="color: #999;font-size: 10px; line-height: 14px;">
+                        Em caso de dúvidas entre em contato:<br />
+                        <a href="mailto:financeiro@gauti.com.br">financeiro@gauti.com.br</a> / <a href="http://gauti.com.br"
+                          target="_blank">gauti.com.br</a><br />
+                        Whatapp: <a href="tel:+5551993975995" target="_blank">+55 51 99397-5995</a>
+                      </small>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td style="font-size: 4px; background: #28a745" bgcolor="#28a745">&nbsp;</td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </center>
+</body>
+
+</html>
