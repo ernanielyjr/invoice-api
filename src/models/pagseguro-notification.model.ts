@@ -67,7 +67,7 @@ interface Transaction {
   code: string;
   reference?: string;
   type: number;
-  status: number;
+  status: PagSeguroTransactionStatus;
   cancellationSource?: 'INTERNAL' | 'EXTERNAL';
   paymentMethod: {
     type: number;
@@ -140,10 +140,27 @@ interface Transaction {
   };
 }
 
+export enum PagSeguroNotificationType {
+  TRANSACTION = 'transaction',
+}
+
+export enum PagSeguroTransactionStatus {
+  AGUARDANDO_PAGAMENTO = '1',
+  EM_ANALISE           = '2',
+  PAGA                 = '3',
+  DISPONIVEL           = '4',
+  EM_DISPUTA           = '5',
+  DEVOLVIDA            = '6',
+  CANCELADA            = '7',
+  DEBITADO             = '8',
+  RETENCAO_TEMPORARIA  = '9',
+}
+
 export interface PagSeguroNotification {
   transaction: Transaction;
 }
 
+export const paidStatus = [PagSeguroTransactionStatus.PAGA, PagSeguroTransactionStatus.DISPONIVEL];
 export const transactionType = $transactionType;
 export const transactionStatus = $transactionStatus;
 export const paymentMethodType = $paymentMethodType;

@@ -12,7 +12,7 @@ class InvoiceRepository extends BaseRepository {
   getOpenedByCustomer(customerId: String) {
     return this.model.findOne({
       _customerId: customerId,
-      closed: true,
+      closed: false,
     });
   }
 

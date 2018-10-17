@@ -90,12 +90,12 @@ class InvoiceController extends CrudController {
 
   async closeAllInvoices(req: Request, res: Response) {
     try {
-      // UNDO: const today = new Date();
+      // FIXME: const today = new Date();
       const today = new Date(2018, 8 - 1, 31);
       const year = today.getFullYear();
       const month = today.getMonth();
 
-      // FIXME: change to close invoice 10 day before maturity
+      // TODO: change to close invoice 10 day before maturity
       const closeDate = new Date(year, month + 1, 0);
 
       if (today.getTime() !== closeDate.getTime()) {

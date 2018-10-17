@@ -2,7 +2,7 @@ import * as https from 'https';
 import * as PagSeguro from 'pagseguro';
 import * as xml2js from 'xml2js';
 import AppConfig from '../configs/app.config';
-import { PagSeguroNotification } from '../models/pagseguro-notification.model';
+import { PagSeguroNotification, PagSeguroTransactionStatus } from '../models/pagseguro-notification.model';
 
 export class PaymentService {
   private paymentProvider: PagSeguro;
@@ -113,8 +113,9 @@ export class PaymentService {
 }
 
 interface DetailResponse {
+  // TODO: mapear objeto completo - https://devs.pagseguro.uol.com.br/docs/checkout-web-notificacoes#recebendo-uma-notificacao-de-transacao
   code: string;
   reference: string;
-  status: number;
+  status: PagSeguroTransactionStatus;
   amount: number;
 }

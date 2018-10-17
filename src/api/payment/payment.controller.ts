@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import Locale from '../../models/locale.model';
+import { PagSeguroNotificationType, PagSeguroTransactionStatus, paidStatus } from '../../models/pagseguro-notification.model';
 import PostingType from '../../models/posting-type.enum';
 import { ErrorMessages, httpStatus, ResponseError, ResponseOk } from '../../models/response.model';
 import { PaymentService } from '../../services/payment.service';
@@ -11,24 +12,25 @@ class PaymentController {
 
   async notify(req: Request, res: Response) {
     try {
-      // FIXME: Rejeitar quando a origem não é o pagseguro
+      // FIXME: Rejeitar quando a origem não é o pagseguro - href
       const { notificationCode, notificationType } = req.body;
       const { id } = req.params;
 
-      if (notificationType !== 'transaction') {
+      if (notificationType !== PagSeguroNotificationType.TRANSACTION) {
         console.error('IS_NOT_TRANSACTION_NOTIFICATION', req.body);
         EmailService.adminLog('IS_NOT_TRANSACTION_NOTIFICATION', req.body);
         return new ResponseOk(res, 'IS_NOT_TRANSACTION_NOTIFICATION');
       }
 
       const result = await PaymentService.getDetail(notificationCode);
-      if (result.code !== notificationCode || result.reference !== id) {
-        console.error('INVALID_DATA', result, req.body);
+      if (result.reference !== id) { // FIXME: check notificationCode ??
+        console.error('INVALID_DATA', result, req.body, id);
         EmailService.adminLog('INVALID_DATA', result);
         return new ResponseError(res, ErrorMessages.PAYMENT_DETAIL_INVALID_DATA);
       }
 
-      if (result.status !== 3) {
+      if (paidStatus.indexOf(result.status) === -1) {
+        console.log('NOT_PAID_STATUS', result);
         EmailService.adminLog('NOT_PAID_STATUS', result);
         return new ResponseOk(res, 'NOT_PAID_STATUS');
       }
@@ -66,15 +68,7 @@ class PaymentController {
         return new ResponseError(res, ErrorMessages.ITEM_NOT_FOUND);
       }
 
-      if (!invoice.closed) {
-        return new ResponseError(res, ErrorMessages.INVOICE_NOT_CLOSED);
-      }
-
-      if (invoice.paid) {
-        return new ResponseError(res, ErrorMessages.INVOICE_ALREADY_PAID);
-      }
-
-      if (force === 'true' || !invoice.paymentCode) {
+      if (force === 'true' || (!invoice.paymentCode && invoice.closed)) {
         const customer = await CustomerRepository.get(invoice._customerId);
 
         const payment = new PaymentService();
