@@ -94,11 +94,13 @@ class InvoiceController extends CrudController {
       const today = new Date();
       const year = today.getFullYear();
       const month = today.getMonth();
+      let monthToClose = month + 1;
 
       // TODO: change to close invoice 10 day before maturity
       let closeDate = new Date(year, month + 1, 0);
       if (force === 'true') {
         closeDate = new Date();
+        monthToClose = month;
       }
 
       if (today.getTime() !== closeDate.getTime()) {
@@ -115,7 +117,7 @@ class InvoiceController extends CrudController {
 
       const invoicesList = await InvoiceRepository.find({
         year,
-        month: month + 1,
+        month: monthToClose,
         closed: false
       });
 
