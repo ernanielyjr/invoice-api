@@ -160,7 +160,8 @@ class InvoiceController extends CrudController {
         const totalAmount = invoice.postings.reduce((sum, posting) => sum + posting.amount, 0);
         const customer = await CustomerRepository.get(invoice._customerId);
 
-        invoice.dueDate = new Date(invoice.year, invoice.month, customer.invoiceMaturity || 10);
+        const dueDate = new Date(invoice.year, invoice.month, customer.invoiceMaturity || 10);
+        invoice.dueDate = dueDate;
         invoice.amount = Math.round(totalAmount * 100) / 100;
         invoice.closed = true;
 
@@ -177,8 +178,8 @@ class InvoiceController extends CrudController {
 
         try {
           const newInvoice = await this.generateNextInvoice(
-            year,
-            month + 1,
+            dueDate.getFullYear(),
+            dueDate.getMonth() + 1,
             invoice._customerId,
             invoice.amount
           );
