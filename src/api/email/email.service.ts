@@ -41,6 +41,7 @@ class EmailService {
 
   invoicePaymentReceived(customer, amount: number) {
     console.log('==== amount', amount);
+    console.log('==== typeof amount', typeof amount);
 
     const name = customer.responsibleName || customer.name || 'Cliente';
     const firstName = name.split(' ')[0];
