@@ -30,6 +30,7 @@ class PaymentController {
       }
 
       const result = await PaymentService.getDetail(notificationCode);
+      console.log('=== result', JSON.stringify(result));
 
       if (result.reference !== id) {
         EmailService.adminLog('INVALID_DATA', result, req.body, id);
