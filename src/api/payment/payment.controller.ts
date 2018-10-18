@@ -49,7 +49,7 @@ class PaymentController {
       openedInvoice.postings.push({
         type: PostingType.income,
         description: 'Pagamento Recebido',
-        amount: Math.abs(result.amount),
+        amount: -Math.abs(result.amount),
       });
       await openedInvoice.save();
 
