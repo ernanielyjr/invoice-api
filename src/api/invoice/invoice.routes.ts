@@ -3,7 +3,7 @@ import InvoiceController from './invoice.controller';
 class InvoiceRoutes {
   public config(app): void {
     app.route('/api/v1/invoice/close').get(InvoiceController.closeAllInvoices.bind(InvoiceController));
-    app.route('/api/v1/invoice/:customerId/first').get(InvoiceController.customerFirstInvoice.bind(InvoiceController));
+    app.route('/api/v1/first-invoice/:customerId').get(InvoiceController.customerFirstInvoice.bind(InvoiceController));
 
     app.route('/api/v1/invoice').get(InvoiceController.get.bind(InvoiceController));
     app.route('/api/v1/invoice').post(InvoiceController.create.bind(InvoiceController));
