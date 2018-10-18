@@ -90,13 +90,16 @@ class InvoiceController extends CrudController {
 
   async closeAllInvoices(req: Request, res: Response) {
     try {
+      const { force } = req.query;
       const today = new Date();
       const year = today.getFullYear();
       const month = today.getMonth();
 
       // TODO: change to close invoice 10 day before maturity
-      const closeDate = new Date(year, month + 1, 0);
-      // FIXME: fazer uma forma de forçar o fechamento
+      let closeDate = new Date(year, month + 1, 0);
+      if (force === 'true') {
+        closeDate = new Date();
+      }
 
       if (today.getTime() !== closeDate.getTime()) {
         console.log('ITS_NOT_THE_CLOSING_DAY');
