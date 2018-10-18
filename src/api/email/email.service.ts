@@ -40,6 +40,8 @@ class EmailService {
   }
 
   invoicePaymentReceived(customer, amount: number) {
+    console.log('==== amount', amount);
+
     const name = customer.responsibleName || customer.name || 'Cliente';
     const firstName = name.split(' ')[0];
     const subject = 'Pagamento recebido!';
