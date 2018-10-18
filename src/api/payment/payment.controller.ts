@@ -47,16 +47,18 @@ class PaymentController {
       invoice.paid = true;
       await invoice.save();
 
+      const amount = Number.parseFloat(result.amount);
+
       const openedInvoice = await InvoiceRepository.getOpenedByCustomer(invoice._customerId);
       openedInvoice.postings.push({
         type: PostingType.income,
         description: 'Pagamento Recebido',
-        amount: -Math.abs(result.amount),
+        amount: -Math.abs(amount),
       });
       await openedInvoice.save();
 
       const customer = await CustomerRepository.get(invoice._customerId);
-      EmailService.invoicePaymentReceived(customer, result.amount);
+      EmailService.invoicePaymentReceived(customer, amount);
 
       return new ResponseOk(res, null, httpStatus.NO_CONTENT);
     } catch (err) {

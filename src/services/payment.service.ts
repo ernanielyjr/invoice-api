@@ -117,5 +117,5 @@ interface DetailResponse {
   code: string;
   reference: string;
   status: PagSeguroTransactionStatus;
-  amount: number;
+  amount: string;
 }

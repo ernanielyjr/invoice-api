@@ -74,7 +74,7 @@ interface Transaction {
     code: number;
   };
   paymentLink?: string;
-  grossAmount: number;
+  grossAmount: string;
   discountAmount: number;
   feeAmount: number;
   netAmount: number;
