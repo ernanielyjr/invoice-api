@@ -13,12 +13,13 @@ class PaymentController {
 
   async notify(req: Request, res: Response) {
     try {
+      /* TODO: improve this domain origin check
       const origin = req.get('origin');
 
       if (AppConfig.pagSeguro.allowedOriginUrl !== origin) {
         EmailService.adminLog('BAD_ORIGIN_DOMAIN', origin, req.body);
         return new ResponseError(res, ErrorMessages.PAYMENT_DETAIL_INVALID_DATA);
-      }
+      } */
 
       const { notificationCode, notificationType } = req.body;
       const { id } = req.params;
