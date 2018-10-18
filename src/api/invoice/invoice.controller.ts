@@ -161,8 +161,8 @@ class InvoiceController extends CrudController {
         const customer = await CustomerRepository.get(invoice._customerId);
 
         invoice.amount = Math.round(totalAmount * 100) / 100;
-        invoice.dueDate.setDate(year, month + 1, customer.invoiceMaturity);
-        invoice.markModified('dueDate');
+        invoice.dueDate = new Date(year, month + 1, customer.invoiceMaturity);
+        console.log('invoice.dueDate', invoice.dueDate);
         invoice.closed = true;
 
         try {
