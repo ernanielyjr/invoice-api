@@ -179,7 +179,7 @@ class InvoiceController extends CrudController {
         try {
           const newInvoice = await this.generateNextInvoice(
             dueDate.getFullYear(),
-            dueDate.getMonth() + 1,
+            dueDate.getMonth(),
             invoice._customerId,
             invoice.amount
           );
