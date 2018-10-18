@@ -1,3 +1,7 @@
+import * as dotenv from 'dotenv';
+
+dotenv.config();
+
 const {
   dbUser,
   dbPass,
@@ -16,7 +20,8 @@ const {
   pagSeguroEmail,
   pagSeguroToken,
   pagSeguroMode,
-  pagSeguroNotificationUrl
+  pagSeguroNotificationUrl,
+  pagSeguroAllowedOriginUrl
 } = process.env;
 
 class Database {
@@ -26,31 +31,32 @@ class Database {
     if (dbUser && dbPass) {
       uriPrefix = `${dbUser}:${dbPass}@`;
     }
-    return `mongodb://${uriPrefix}${dbHost || 'localhost'}:${dbPort || 27017}/${dbName || 'myplan-api'}`;
+    return `mongodb://${uriPrefix}${dbHost}:${dbPort}/${dbName}`;
   }
 }
 
 class AppConfig {
-  adminEmail = adminEmail || 'ernani.gauti@gmail.com';
-  emailBaseUrl = emailBaseUrl || 'http://localhost/';
+  adminEmail = adminEmail;
+  emailBaseUrl = emailBaseUrl;
   smtp = {
-    service: smtpService || 'gmail',
-    user: smtpUser || 'ernani@gauti.com.br',
-    pass: smtpPass || 'dnjmtumucmuxbuey',
-    name: smtpName || 'Financeiro - Gauti',
-    email: smtpEmail || 'financeiro@gauti.com.br'
+    service: smtpService,
+    user: smtpUser,
+    pass: smtpPass,
+    name: smtpName,
+    email: smtpEmail,
   };
-  passKey = appPassKey || '8C1DFCE96682D7472406DF6C2F29EFD9F71E39F06EEA71DB564CBC496E4C19C6';
+  passKey = appPassKey;
   database = new Database();
   jwt = {
-    secret: jwtSecret || 'D6DC9BECDD295E9663AF19F889C8F0CD91B5C30970C47EB4897A9A4824C4C1CD',
+    secret: jwtSecret,
     expiration: 24 * 60 * 60,
   };
   pagSeguro = {
-    email: pagSeguroEmail || 'ernani@gauti.com.br',
-    token: pagSeguroToken || '1784F9336ED8445A9487C267BE96C1E2',
-    mode: (pagSeguroMode || 'sandbox') as 'payment' | 'sandbox' | 'subscription',
-    notificationUrl: pagSeguroNotificationUrl || 'https://ws.sandbox.pagseguro.uol.com.br/v3/transactions/notifications'
+    email: pagSeguroEmail,
+    token: pagSeguroToken,
+    mode: pagSeguroMode as 'payment' | 'sandbox' | 'subscription',
+    notificationUrl: pagSeguroNotificationUrl,
+    allowedOriginUrl: pagSeguroAllowedOriginUrl,
   };
 }
 

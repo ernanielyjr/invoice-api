@@ -1,9 +1,9 @@
-import EmailRepository from './email.repository';
-import AppConfig from '../../configs/app.config';
-import Locale from '../../models/locale.model';
 import * as ejs from 'ejs';
 import * as fs from 'fs';
 import * as path from 'path';
+import AppConfig from '../../configs/app.config';
+import { Helper } from '../../helper';
+import EmailRepository from './email.repository';
 
 class EmailService {
 
@@ -11,9 +11,11 @@ class EmailService {
 
   constructor() { }
 
-  adminLog(label: string, data: any) {
+  adminLog(label: string, ...data: any[]) {
+    console.error(label, data);
     const subject = `LOG MyPlan - ${label}`;
-    const body = this.templateService.log(JSON.stringify(data));
+    const allData = data.map(value => this.templateService.log(value));
+    const body: string = this.templateService.default(allData.join('<hr />'));
 
     return this.register(AppConfig.adminEmail, subject, body);
   }
@@ -30,21 +32,23 @@ class EmailService {
       monthYear,
       dueDate,
       closedInvoice.amount.toFixed(2),
-      `${AppConfig.emailBaseUrl}/api/v1/payment/${closedInvoice._id}`
+      `${AppConfig.emailBaseUrl}/${closedInvoice._id}`
     );
 
     return this.register(customer.emails.join(','), subject, body);
   }
 
-  invoicePaymentReceived(customer, invoice, amount: number) {
-    // FIXME: TERMINAR
-    /* if (Math.abs(invoice.amount) !== Math.abs(amount)) {
-      let content = JSON.stringify(invoice);
-      content += '\n\n';
-      content += `receivedAmount = ${amount}`;
-      const alertBody = this.templateService.log(content);
-      this.register(AppConfig.adminEmail, 'Divergência nos valores', alertBody);
-    } */
+  invoicePaymentReceived(customer, amount: number) {
+    const firstName = customer.responsibleName.split(' ')[0];
+    const subject = 'Pagamento recebido!';
+
+    const body = this.templateService.invoicePaymentReceived(
+      subject,
+      firstName,
+      amount.toFixed(2)
+    );
+
+    return this.register(customer.emails.join(','), subject, body);
   }
 
   private register(cc: string | string[], subject: string, body: string) {
@@ -65,19 +69,6 @@ class EmailService {
     }
 
     return EmailRepository.create(email);
-  }
-}
-
-class Helper {
-  static getFormattedDate(day: number, month: number, year: number): string {
-    const dayStr = String(`00${day}`).slice(-2);
-    const monthStr = String(`00${month}`).slice(-2);
-    const yearStr = String(`0000${year}`).slice(-4);
-    return `${dayStr}/${monthStr}/${yearStr}`;
-  }
-
-  static getMonthYear(month: number, year: number) {
-    return `${Locale.monthNames[month]}/${year}`;
   }
 }
 
@@ -119,7 +110,7 @@ class TemplateService {
       newContent = JSON.stringify(content);
     }
 
-    return `<pre>${newContent}</pre>`;
+    return `<pre>${newContent}</pre><hr />`;
   }
 
   invoiceClosed(subject: string, firstName: string, monthYear: string, dueDate: string, totalAmount: string, paymentLink: string) {
@@ -133,16 +124,13 @@ class TemplateService {
     });
   }
 
-  /* invoicePaymentReceived(totalAmount: string) {
-    // FIXME: FAZER TEMPLATE PARA PAGAMENTO RECEBIDO
+  invoicePaymentReceived(subject: string, firstName: string, totalAmount: string) {
     return this.renderTemplateFile(path.resolve(__dirname, '../../templates/invoice-payment-received.ejs'), {
+      subject,
       firstName,
-      monthYear,
-      dueDate,
       totalAmount,
-      paymentLink,
     });
-  } */
+  }
 }
 
 export default new EmailService;

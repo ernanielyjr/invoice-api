@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
+import AppConfig from '../../configs/app.config';
 import Locale from '../../models/locale.model';
-import { PagSeguroNotificationType, PagSeguroTransactionStatus, paidStatus } from '../../models/pagseguro-notification.model';
+import { PagSeguroNotificationType, PagSeguroTransactionStatus } from '../../models/pagseguro-notification.model';
 import PostingType from '../../models/posting-type.enum';
 import { ErrorMessages, httpStatus, ResponseError, ResponseOk } from '../../models/response.model';
 import { PaymentService } from '../../services/payment.service';
@@ -12,25 +13,29 @@ class PaymentController {
 
   async notify(req: Request, res: Response) {
     try {
-      // FIXME: Rejeitar quando a origem não é o pagseguro - href
+      const origin = req.get('origin');
+
+      if (AppConfig.pagSeguro.allowedOriginUrl !== origin) {
+        EmailService.adminLog('BAD_ORIGIN_DOMAIN', origin, req.body);
+        return new ResponseError(res, ErrorMessages.PAYMENT_DETAIL_INVALID_DATA);
+      }
+
       const { notificationCode, notificationType } = req.body;
       const { id } = req.params;
 
       if (notificationType !== PagSeguroNotificationType.TRANSACTION) {
-        console.error('IS_NOT_TRANSACTION_NOTIFICATION', req.body);
         EmailService.adminLog('IS_NOT_TRANSACTION_NOTIFICATION', req.body);
         return new ResponseOk(res, 'IS_NOT_TRANSACTION_NOTIFICATION');
       }
 
       const result = await PaymentService.getDetail(notificationCode);
-      if (result.reference !== id) { // FIXME: check notificationCode ??
-        console.error('INVALID_DATA', result, req.body, id);
-        EmailService.adminLog('INVALID_DATA', result);
+
+      if (result.reference !== id) {
+        EmailService.adminLog('INVALID_DATA', result, req.body, id);
         return new ResponseError(res, ErrorMessages.PAYMENT_DETAIL_INVALID_DATA);
       }
 
-      if (paidStatus.indexOf(result.status) === -1) {
-        console.log('NOT_PAID_STATUS', result);
+      if (result.status !== PagSeguroTransactionStatus.PAGA) {
         EmailService.adminLog('NOT_PAID_STATUS', result);
         return new ResponseOk(res, 'NOT_PAID_STATUS');
       }
@@ -49,7 +54,7 @@ class PaymentController {
       await openedInvoice.save();
 
       const customer = await CustomerRepository.get(invoice._customerId);
-      EmailService.invoicePaymentReceived(customer, invoice, result.amount);
+      EmailService.invoicePaymentReceived(customer, result.amount);
 
       return new ResponseOk(res, null, httpStatus.NO_CONTENT);
     } catch (err) {

@@ -8,12 +8,7 @@ export default new mongoose.Schema({
     required: [true, 'invoice.customer.required']
   },
   closed: Boolean,
-  day: { // FIXME: change to store full date on next month relative to "month" property
-    type: Number,
-    min: 1,
-    max: 31,
-    required: [true, 'invoice.day.required']
-  },
+  dueDate: Date,
   month: {
     type: Number,
     min: 1,

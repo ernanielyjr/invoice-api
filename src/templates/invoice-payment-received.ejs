@@ -23,7 +23,7 @@
               <td align="center" valign="top" style="padding: 10px 20px; color: #FFFFFF; background: #28a745" bgcolor="#28a745">
                 <h1 style="font-weight: 100; padding: 0; margin: 0;">
                   GAUTI<br />
-                  <small style="font-size: 20px;">Fatura de Hospedagem</small>
+                  <small style="font-size: 20px;">Pagamento Recebido</small>
                 </h1>
               </td>
             </tr>
@@ -39,37 +39,12 @@
                   <tr>
                     <td align="center" valign="top" style="padding: 10px 20px;">
                       <h2 style="font-weight: 100; font-size: 20px; line-height: 28px; max-width: 340px;">
-                        Sua fatura de <b style="font-weight: normal;"><%=monthYear%></b> está fechada e disponível para
-                        pagamento!
+                        Recebemos seu pagamento no valor de R$ <%=totalAmount%>. Obrigado!
                       </h2>
                     </td>
                   </tr>
                   <tr>
-                    <td align="center" valign="top" style="padding: 10px 20px; line-height: 28px;">
-                      <b>Vencimento:</b> <%=dueDate%>*<br />
-                      <b>Valor:</b> R$ <%=totalAmount%>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td align="center" valign="top" style="padding: 20px;line-height: 22px;">
-                      <a style="font-size: 20px; font-weight: 100; color: #FFFFFF; text-decoration: none; min-width: 200px; border-radius: 10px; padding: 12px; box-sizing: border-box; display: inline-block; background: #28a745"
-                        href="<%=paymentLink%>" target="_blank">Pagar agora</a><br />
-                      <br />
-                      <small style="color: #999;">ou acesse o link abaixo:</small><br />
-                      <br />
-                      <code style="background-color: #F0F0F0; display: inline-block; padding: 5px 10px; border: solid 1px #EAEAEA;"><%=paymentLink%></code><br />
-                      <!-- <br />
-                      <small>{{ bandeiras_de_pagamento }}</small> -->
-                    </td>
-                  </tr>
-                  <tr>
                     <td align="center" valign="top" style="padding: 20px;">
-                      <small style="font-size: 10px; display: inline-block; max-width: 360px; line-height: 14px;">
-                        * Excepcionalmente para o mês de outubro, o vencimento será no dia 20. A partir de novembro, o
-                        vencimento volta a ser no dia 10 de cada mês.
-                      </small><br />
-                      <br />
-                      <br />
                       <small style="color: #999;font-size: 10px; line-height: 14px;">
                         Em caso de dúvidas entre em contato:<br />
                         <a href="mailto:financeiro@gauti.com.br">financeiro@gauti.com.br</a> / <a href="http://gauti.com.br"

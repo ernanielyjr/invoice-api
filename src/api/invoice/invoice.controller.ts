@@ -13,12 +13,11 @@ class InvoiceController extends CrudController {
     super(InvoiceRepository);
   }
 
-  private generateNextInvoice(year: number, month: number, day: number, customerId: string, amount: number = 0) {
+  private generateNextInvoice(year: number, month: number, customerId: string, amount: number) {
     return new Promise(async (resolve, reject) => {
 
       const nextInvoiceDate = new Date(year, month, 1);
       const nextInvoice = {
-        day,
         month: nextInvoiceDate.getMonth() + 1,
         year: nextInvoiceDate.getFullYear(),
         _customerId: customerId,
@@ -61,6 +60,7 @@ class InvoiceController extends CrudController {
   async customerFirstInvoice(req: Request, res: Response) {
     try {
       const { customerId } = req.params;
+      const { month, year } = req.query;
 
       const customerInvoices = await InvoiceRepository.getByCustomer(customerId);
       if (customerInvoices && customerInvoices.length) {
@@ -69,8 +69,8 @@ class InvoiceController extends CrudController {
       }
 
       const today = new Date();
-      const year = today.getFullYear();
-      const month = today.getMonth();
+      const baseYear = year || today.getFullYear();
+      const baseMonth = month || (today.getMonth() - 1);
 
       const customer = await CustomerRepository.get(customerId);
 
@@ -79,7 +79,7 @@ class InvoiceController extends CrudController {
         return new ResponseError(res, ErrorMessages.GENERIC_ERROR);
       }
 
-      const newInvoice = await this.generateNextInvoice(year, month - 1, customer.invoiceMaturity, customerId);
+      const newInvoice = await this.generateNextInvoice(baseYear, baseMonth, customerId, 0);
       return new ResponseOk(res, newInvoice);
 
     } catch (err) {
@@ -90,13 +90,13 @@ class InvoiceController extends CrudController {
 
   async closeAllInvoices(req: Request, res: Response) {
     try {
-      // FIXME: const today = new Date();
-      const today = new Date(2018, 8 - 1, 31);
+      const today = new Date();
       const year = today.getFullYear();
       const month = today.getMonth();
 
       // TODO: change to close invoice 10 day before maturity
       const closeDate = new Date(year, month + 1, 0);
+      // FIXME: fazer uma forma de forçar o fechamento
 
       if (today.getTime() !== closeDate.getTime()) {
         console.log('ITS_NOT_THE_CLOSING_DAY');
@@ -153,8 +153,10 @@ class InvoiceController extends CrudController {
         }
 
         const totalAmount = invoice.postings.reduce((sum, posting) => sum + posting.amount, 0);
+        const customer = await CustomerRepository.get(invoice._customerId);
 
         invoice.amount = Math.round(totalAmount * 100) / 100;
+        invoice.dueDate = new Date(year, month + 1, customer.invoiceMaturity);
         invoice.closed = true;
 
         try {
@@ -166,14 +168,12 @@ class InvoiceController extends CrudController {
           response.closeError.push(invoice);
         }
 
-        const customer = await CustomerRepository.get(invoice._customerId);
         await EmailService.invoiceClosed(customer, invoice);
 
         try {
           const newInvoice = await this.generateNextInvoice(
             year,
             month + 1,
-            customer.invoiceMaturity,
             invoice._customerId,
             invoice.amount
           );
