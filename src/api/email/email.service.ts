@@ -21,7 +21,8 @@ class EmailService {
   }
 
   invoiceClosed(customer, closedInvoice) {
-    const firstName = customer.responsibleName.split(' ')[0];
+    const name = customer.responsibleName || customer.name || 'Cliente';
+    const firstName = name.split(' ')[0];
     const monthYear = Helper.getMonthYear(closedInvoice.month - 1, closedInvoice.year);
     const dueDate = Helper.getFormattedDate(customer.invoiceMaturity, closedInvoice.month + 1, closedInvoice.year);
     const subject = `Sua fatura de ${monthYear} está fechada`;
@@ -39,7 +40,8 @@ class EmailService {
   }
 
   invoicePaymentReceived(customer, amount: number) {
-    const firstName = customer.responsibleName.split(' ')[0];
+    const name = customer.responsibleName || customer.name || 'Cliente';
+    const firstName = name.split(' ')[0];
     const subject = 'Pagamento recebido!';
 
     const body = this.templateService.invoicePaymentReceived(
