@@ -163,6 +163,7 @@ class InvoiceController extends CrudController {
         const dueDate = new Date(year, month + 1, customer.invoiceMaturity);
         invoice.dueDate = dueDate;
         console.log('==== dueDate', dueDate);
+        console.log('==== date', year, month + 1, customer.invoiceMaturity);
 
         invoice.amount = Math.round(totalAmount * 100) / 100;
         invoice.closed = true;
