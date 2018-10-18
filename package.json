@@ -7,7 +7,7 @@
     "postinstall": "npm run compile",
     "start": "npm run serve",
     "serve": "nodemon ./dist/server.js --watch ./dist --watch package.json",
-    "compile": "tslint --project ./ && tsc",
+    "compile": "tslint --project ./ && tsc && cp -R ./src/templates ./dist",
     "autocompile": "npm run compile -- -w",
     "serve-dev": "concurrently --kill-others \"npm run autocompile\" \"npm run serve\""
   },
