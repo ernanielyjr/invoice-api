@@ -8,6 +8,7 @@ const {
   dbHost,
   dbPort,
   dbName,
+  apiBaseUrl,
   adminEmail,
   emailBaseUrl,
   smtpService,
@@ -36,6 +37,7 @@ class Database {
 }
 
 class AppConfig {
+  apiBaseUrl = apiBaseUrl;
   adminEmail = adminEmail;
   emailBaseUrl = emailBaseUrl;
   smtp = {
