@@ -14,6 +14,7 @@ export default new mongoose.Schema({
   },
   description: String,
   amount: Number,
+  notificationCode: String,
 
 }, {
   timestamps: true,

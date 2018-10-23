@@ -30,9 +30,8 @@ class PaymentController {
       }
 
       const result = await PaymentService.getDetail(notificationCode);
-      console.log('=== result', JSON.stringify(result));
 
-      if (result.reference !== id) {
+      if (!result || result.reference !== id) {
         EmailService.adminLog('INVALID_DATA', result, req.body, id);
         return new ResponseError(res, ErrorMessages.PAYMENT_DETAIL_INVALID_DATA);
       }
@@ -50,15 +49,20 @@ class PaymentController {
       const amount = Number.parseFloat(result.amount);
 
       const openedInvoice = await InvoiceRepository.getOpenedByCustomer(invoice._customerId);
-      openedInvoice.postings.push({
-        type: PostingType.income,
-        description: 'Pagamento Recebido',
-        amount: -Math.abs(amount),
-      });
-      await openedInvoice.save();
+      const postingPayment = openedInvoice.postings.find(posting => posting.notificationCode === notificationCode);
 
-      const customer = await CustomerRepository.get(invoice._customerId);
-      EmailService.invoicePaymentReceived(customer, amount);
+      if (!postingPayment) {
+        openedInvoice.postings.push({
+          notificationCode,
+          type: PostingType.income,
+          description: 'Pagamento Recebido',
+          amount: -Math.abs(amount),
+        });
+        await openedInvoice.save();
+
+        const customer = await CustomerRepository.get(invoice._customerId);
+        EmailService.invoicePaymentReceived(customer, amount);
+      }
 
       return new ResponseOk(res, null, httpStatus.NO_CONTENT);
     } catch (err) {
