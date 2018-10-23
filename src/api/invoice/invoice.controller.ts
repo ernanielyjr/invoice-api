@@ -126,76 +126,93 @@ class InvoiceController extends CrudController {
         return new ResponseOk(res, null, httpStatus.NO_CONTENT);
       }
 
-      const response = {
-        closed: [],
-        opened: [],
-        closeError: [],
-        openError: [],
-      };
-
       for (const invoice of invoicesList) {
-        const totalIncome = invoice.postings
-          .filter(posting => posting.amount > 0 && posting.type !== PostingType.balance)
-          .reduce((sum, posting) => sum + posting.amount, 0);
-
-        let previousBalance = invoice.postings
-          .filter(posting => posting.type === PostingType.balance)
-          .reduce((sum, posting) => sum + posting.amount, 0);
-
-        previousBalance = totalIncome + previousBalance;
-
-        if (previousBalance < 0) {
-          let charges = Math.round((previousBalance * (0.02 + 0.01)) * 100) / 100;
-          if (charges === 0) {
-            charges = -0.01;
-          }
-
-          invoice.postings.push({
-            type: PostingType.charges,
-            description: 'Encargos',
-            amount: charges,
-          });
-        }
-
-        const totalAmount = invoice.postings.reduce((sum, posting) => sum + posting.amount, 0);
-        const customer = await CustomerRepository.get(invoice._customerId);
-
-        const dueDate = new Date(invoice.year, invoice.month, customer.invoiceMaturity || 10);
-        invoice.dueDate = dueDate;
-        invoice.amount = Math.round(totalAmount * 100) / 100;
-        invoice.closed = true;
-
-        try {
-          const updatedInvoice = await invoice.save();
-          response.closed.push(updatedInvoice);
-
-        } catch (err) {
-          console.error('INVOICE_CLOSE_ERROR', err, invoice);
-          response.closeError.push(invoice);
-        }
-
-        await EmailService.invoiceClosed(customer, invoice);
-
-        try {
-          const newInvoice = await this.generateNextInvoice(
-            dueDate.getFullYear(),
-            dueDate.getMonth(),
-            invoice._customerId,
-            invoice.amount
-          );
-          response.opened.push(newInvoice);
-
-        } catch (err) {
-          console.error('INVOICE_OPEN_ERROR', err);
-          response.openError.push(err);
-        }
+        await this.closeOneInvoice(invoice);
       }
 
-      new ResponseOk(res, response);
+      new ResponseOk(res, null);
 
     } catch (err) {
       console.error('INVOICE_CLOSE_ALL_ERROR', err, req.body);
       new ResponseError(res, ErrorMessages.GENERIC_ERROR);
+    }
+  }
+
+  async closeInvoice(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+
+      const invoice = await InvoiceRepository.get(id);
+
+      if (!invoice) {
+        console.error('INVOICE_NOT_FOUND', id);
+        new ResponseError(res, ErrorMessages.GENERIC_ERROR);
+      }
+
+      if (invoice.closed) {
+        console.error('INVOICE_ALREADY_CLOSED', invoice);
+        new ResponseError(res, ErrorMessages.GENERIC_ERROR);
+      }
+
+      await this.closeOneInvoice(invoice);
+
+    } catch (err) {
+      console.error('INVOICE_CLOSE_ONE_ERROR', err, req.body);
+      new ResponseError(res, ErrorMessages.GENERIC_ERROR);
+    }
+  }
+
+  private async closeOneInvoice(invoice) {
+    const totalIncome = invoice.postings
+      .filter(posting => posting.amount > 0 && posting.type !== PostingType.balance)
+      .reduce((sum, posting) => sum + posting.amount, 0);
+
+    let previousBalance = invoice.postings
+      .filter(posting => posting.type === PostingType.balance)
+      .reduce((sum, posting) => sum + posting.amount, 0);
+
+    previousBalance = totalIncome + previousBalance;
+
+    if (previousBalance < 0) {
+      let charges = Math.round((previousBalance * (0.02 + 0.01)) * 100) / 100;
+      if (charges === 0) {
+        charges = -0.01;
+      }
+
+      invoice.postings.push({
+        type: PostingType.charges,
+        description: 'Encargos',
+        amount: charges,
+      });
+    }
+
+    const totalAmount = invoice.postings.reduce((sum, posting) => sum + posting.amount, 0);
+    const customer = await CustomerRepository.get(invoice._customerId);
+
+    const dueDate = new Date(invoice.year, invoice.month, customer.invoiceMaturity || 10);
+    invoice.dueDate = dueDate;
+    invoice.amount = Math.round(totalAmount * 100) / 100;
+    invoice.closed = true;
+
+    try {
+      await invoice.save();
+
+    } catch (err) {
+      console.error('INVOICE_CLOSE_ERROR', err, invoice);
+    }
+
+    await EmailService.invoiceClosed(customer, invoice);
+
+    try {
+      await this.generateNextInvoice(
+        dueDate.getFullYear(),
+        dueDate.getMonth(),
+        invoice._customerId,
+        invoice.amount
+      );
+
+    } catch (err) {
+      console.error('INVOICE_OPEN_ERROR', err);
     }
   }
 }
