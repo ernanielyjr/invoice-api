@@ -156,6 +156,8 @@ class InvoiceController extends CrudController {
 
       await this.closeOneInvoice(invoice);
 
+      return new ResponseOk(res, null, httpStatus.NO_CONTENT);
+
     } catch (err) {
       console.error('INVOICE_CLOSE_ONE_ERROR', err, req.body);
       new ResponseError(res, ErrorMessages.GENERIC_ERROR);
