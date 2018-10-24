@@ -69,7 +69,7 @@ class EmailController extends CrudController {
         return new ResponseError(res, ErrorMessages.GENERIC_ERROR);
       }
 
-      return new ResponseOk(res, null, httpStatus.NO_CONTENT);
+      return new ResponseOk(res, null);
 
     } catch (err) {
       console.error('CRUD_GET_ERROR', err, req.body);
