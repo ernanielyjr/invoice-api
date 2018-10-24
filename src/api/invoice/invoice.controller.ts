@@ -116,7 +116,7 @@ class InvoiceController extends CrudController {
       }
 
       const invoicesList = await InvoiceRepository.find({
-        year,
+        year, // WTF: bug
         month: monthToClose,
         closed: false
       });

@@ -20,7 +20,7 @@ export class PaymentService {
   setReference(reference: string): void {
     const code = reference.toString();
     this.paymentProvider.reference(code)
-    .setRedirectURL(`${AppConfig.apiBaseUrl}/v1/payment/${code}`)
+    .setRedirectURL(`${AppConfig.emailBaseUrl}/${code}`)
     .setNotificationURL(`${AppConfig.apiBaseUrl}/v1/payment/${code}/notify`);
   }
 

@@ -8,7 +8,7 @@ import EmailRepository from './email.repository';
 
 class EmailController extends CrudController {
 
-  private transporter: Mail;
+  private transporter: Mail; // TODO: mudar pra service
   private defaultMessage = {
     from: {
       name: AppConfig.smtp.name,
