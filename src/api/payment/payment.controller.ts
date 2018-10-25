@@ -25,19 +25,19 @@ class PaymentController {
       const { id } = req.params;
 
       if (notificationType !== PagSeguroNotificationType.TRANSACTION) {
-        EmailService.adminLog('IS_NOT_TRANSACTION_NOTIFICATION', req.body);
+        EmailService.adminLog('IS_NOT_TRANSACTION_NOTIFICATION', { invoiceId: id }, { body: req.body });
         return new ResponseOk(res, 'IS_NOT_TRANSACTION_NOTIFICATION');
       }
 
       const result = await PaymentService.getDetail(notificationCode);
 
       if (!result || result.reference !== id) {
-        EmailService.adminLog('INVALID_DATA', result, req.body, id);
+        EmailService.adminLog('INVALID_DATA', result, { invoiceId: id }, { body: req.body });
         return new ResponseError(res, ErrorMessages.PAYMENT_DETAIL_INVALID_DATA);
       }
 
       if (result.status !== PagSeguroTransactionStatus.PAGA) {
-        EmailService.adminLog('NOT_PAID_STATUS', result);
+        EmailService.adminLog('NOT_PAID_STATUS', result, { invoiceId: id }, { body: req.body });
         return new ResponseOk(res, 'NOT_PAID_STATUS');
       }
 
