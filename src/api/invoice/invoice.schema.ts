@@ -24,10 +24,10 @@ export default new mongoose.Schema({
   amount: Number,
   postings: [PostingSchema],
   paymentCode: String,
-  paid: Boolean,
+  paid: Boolean, // TODO: ainda faz sentido?
   lastStatus: {
     type: String,
-    enum: Object.keys(PagSeguroTransactionStatus),
+    enum: Object.keys(PagSeguroTransactionStatus).map(key => PagSeguroTransactionStatus[key]),
     required: [false, 'invoice.lastStatus.required']
   }
 

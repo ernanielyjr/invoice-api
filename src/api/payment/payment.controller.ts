@@ -43,7 +43,7 @@ class PaymentController {
       }
 
       invoice.lastStatus = result.status;
-      invoice.paid = true;
+      invoice.paid = result.status === PagSeguroTransactionStatus.PAGA;
       await invoice.save();
 
       const customer = await CustomerRepository.get(invoice._customerId);
