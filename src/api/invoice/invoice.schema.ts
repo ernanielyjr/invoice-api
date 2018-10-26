@@ -1,4 +1,5 @@
 import * as mongoose from 'mongoose';
+import { PagSeguroTransactionStatus } from '../../models/pagseguro-notification.model';
 import PostingSchema from '../posting/posting.schema';
 
 export default new mongoose.Schema({
@@ -24,6 +25,11 @@ export default new mongoose.Schema({
   postings: [PostingSchema],
   paymentCode: String,
   paid: Boolean,
+  lastStatus: {
+    type: String,
+    enum: Object.keys(PagSeguroTransactionStatus),
+    required: [false, 'invoice.lastStatus.required']
+  }
 
 }, {
   timestamps: true,

@@ -36,7 +36,7 @@ class EmailService {
       `${AppConfig.emailBaseUrl}/${closedInvoice._id}`
     );
 
-    return this.register(customer.emails.join(','), subject, body);
+    return this.register(customer.emails, subject, body);
   }
 
   invoicePaymentReceived(customer, amount: number) {
@@ -50,7 +50,7 @@ class EmailService {
       amount.toFixed(2)
     );
 
-    return this.register(customer.emails.join(','), subject, body);
+    return this.register(customer.emails, subject, body);
   }
 
   private register(cc: string | string[], subject: string, body: string) {
@@ -109,7 +109,7 @@ class TemplateService {
     if (typeof content === 'string') {
       newContent = content;
     } else {
-      newContent = JSON.stringify(content);
+      newContent = JSON.stringify(content, null, 4);
     }
 
     return `<pre>${newContent}</pre><hr />`;

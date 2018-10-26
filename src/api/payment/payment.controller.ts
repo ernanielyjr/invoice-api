@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
-import AppConfig from '../../configs/app.config';
-import Locale from '../../models/locale.model';
+import { Helper } from '../../helper';
 import { PagSeguroNotificationType, PagSeguroTransactionStatus } from '../../models/pagseguro-notification.model';
 import PostingType from '../../models/posting-type.enum';
 import { ErrorMessages, httpStatus, ResponseError, ResponseOk } from '../../models/response.model';
@@ -25,43 +24,51 @@ class PaymentController {
       const { id } = req.params;
 
       if (notificationType !== PagSeguroNotificationType.TRANSACTION) {
-        EmailService.adminLog('IS_NOT_TRANSACTION_NOTIFICATION', { invoiceId: id }, { body: req.body });
+        EmailService.adminLog('IS_NOT_TRANSACTION_NOTIFICATION', { params: req.params }, { body: req.body });
         return new ResponseOk(res, 'IS_NOT_TRANSACTION_NOTIFICATION');
       }
 
       const result = await PaymentService.getDetail(notificationCode);
 
       if (!result || result.reference !== id) {
-        EmailService.adminLog('INVALID_DATA', result, { invoiceId: id }, { body: req.body });
+        EmailService.adminLog('INVALID_DATA', { params: req.params }, { body: req.body }, { result });
         return new ResponseError(res, ErrorMessages.PAYMENT_DETAIL_INVALID_DATA);
-      }
-
-      if (result.status !== PagSeguroTransactionStatus.PAGA) {
-        EmailService.adminLog('NOT_PAID_STATUS', result, { invoiceId: id }, { body: req.body });
-        return new ResponseOk(res, 'NOT_PAID_STATUS');
       }
 
       const invoice = await InvoiceRepository.get(id);
 
+      if (!invoice) {
+        EmailService.adminLog('INVOICE_NOT_FOUND', { params: req.params }, { body: req.body }, { result });
+        return new ResponseError(res, ErrorMessages.PAYMENT_DETAIL_INVALID_DATA);
+      }
+
+      invoice.lastStatus = result.status;
       invoice.paid = true;
       await invoice.save();
 
-      const amount = Number.parseFloat(result.amount);
+      const customer = await CustomerRepository.get(invoice._customerId);
 
-      const openedInvoice = await InvoiceRepository.getOpenedByCustomer(invoice._customerId);
-      const postingPayment = openedInvoice.postings.find(posting => posting.notificationCode === notificationCode);
+      if (result.status !== PagSeguroTransactionStatus.PAGA) {
+        EmailService.adminLog('NOT_PAID_STATUS', { params: req.params }, { body: req.body }, { result }, { invoice }, { customer });
+      }
 
-      if (!postingPayment) {
-        openedInvoice.postings.push({
-          notificationCode,
-          type: PostingType.income,
-          description: 'Pagamento Recebido',
-          amount: -Math.abs(amount),
-        });
-        await openedInvoice.save();
+      if (result.status === PagSeguroTransactionStatus.PAGA) {
+        const amount = Number.parseFloat(result.amount);
 
-        const customer = await CustomerRepository.get(invoice._customerId);
-        EmailService.invoicePaymentReceived(customer, amount);
+        const openedInvoice = await InvoiceRepository.getOpenedByCustomer(invoice._customerId);
+        const postingPayment = openedInvoice.postings.find(posting => posting.notificationCode === notificationCode);
+
+        if (!postingPayment) {
+          openedInvoice.postings.push({
+            notificationCode,
+            type: PostingType.income,
+            description: 'Pagamento Recebido',
+            amount: -Math.abs(amount),
+          });
+          await openedInvoice.save();
+
+          EmailService.invoicePaymentReceived(customer, amount);
+        }
       }
 
       return new ResponseOk(res, null, httpStatus.NO_CONTENT);
@@ -88,9 +95,9 @@ class PaymentController {
         payment.setReference(invoice._id);
         payment.setCustomer(customer.emails[0], customer.name);
 
-        const monthName = Locale.monthNames[invoice.month];
+        const monthYear = Helper.getMonthYear(invoice.month - 1, invoice.year);
 
-        payment.addItem(`Fatura de ${monthName} de ${invoice.year}`, invoice.amount);
+        payment.addItem(`Fatura de ${monthYear} de ${invoice.year}`, invoice.amount);
 
         invoice.paymentCode = await payment.getCode();
         await invoice.save();
