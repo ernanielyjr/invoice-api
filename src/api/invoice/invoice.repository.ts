@@ -72,7 +72,12 @@ class InvoiceRepository extends BaseRepository {
       console.error('INVOICE_CLOSE_ERROR', err, invoice);
     }
 
-    await EmailService.invoiceClosed(customer, invoice);
+    try {
+      await EmailService.invoiceClosed(customer, invoice);
+
+    } catch (err) {
+      console.error('INVOICE_CLOSE_EMAIL_ERROR', err, invoice);
+    }
 
     try {
       await CustomerRepository.generateNextInvoice(
