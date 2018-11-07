@@ -24,6 +24,7 @@ export default new mongoose.Schema({
     city: String,
     state: String,
     country: String,
+    zipCode: String,
   },
 
   notes: [String],
