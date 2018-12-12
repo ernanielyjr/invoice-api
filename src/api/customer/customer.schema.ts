@@ -27,6 +27,10 @@ export default new mongoose.Schema({
     zipCode: String,
   },
 
+  emitNFSe: {
+    type: Boolean,
+    default: false
+  },
   notes: [String],
 
 }, {

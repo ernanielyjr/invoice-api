@@ -2,7 +2,7 @@ import * as mongoose from 'mongoose';
 import { PagSeguroTransactionStatus } from '../../models/pagseguro-notification.model';
 import PostingSchema from '../posting/posting.schema';
 
-export default new mongoose.Schema({
+const invoiceSchema = new mongoose.Schema({
   _customerId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Customer',
@@ -34,5 +34,17 @@ export default new mongoose.Schema({
 }, {
   timestamps: true,
   usePushEach: true,
-  versionKey: false
+  versionKey: false,
 });
+
+invoiceSchema.set('toObject', { virtuals: true });
+invoiceSchema.set('toJSON', { virtuals: true });
+
+invoiceSchema.virtual('customer', {
+  ref: 'Customer',
+  localField: '_customerId',
+  foreignField: '_id',
+  justOne: true,
+});
+
+export default invoiceSchema;

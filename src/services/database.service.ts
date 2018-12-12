@@ -17,7 +17,7 @@ class DatabaseService {
   logger() {
     this.dbConnection = mongoose.connection;
     this.dbConnection.on('connected', () => console.log(`Mongose is connected in ${AppConfig.database.uri}`));
-    this.dbConnection.on('error', error => console.error.bind(console, `Connection Error: ${error}`));
+    this.dbConnection.on('error', error => console.error('Connection Error:', error));
     this.dbConnection.on('disconnected', () => console.log(`Mongose is disconnected in ${AppConfig.database.uri}`));
   }
 

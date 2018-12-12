@@ -11,17 +11,28 @@ class InvoiceRepository extends BaseRepository {
     super(mongoose.model('Invoice', InvoiceSchema));
   }
 
+  get(id?) {
+    if (!id) {
+      return this.model.find().populate('customer').exec();
+    }
+    return this.model.findById(id).populate('customer').exec();
+  }
+
+  find(query) {
+    return this.model.find(query).populate('customer').exec();
+  }
+
   getOpenedByCustomer(customerId: String) {
     return this.model.findOne({
       _customerId: customerId,
       closed: false,
-    });
+    }).populate('customer');
   }
 
   getByCustomer(customerId: String) {
     return this.model.find({
       _customerId: customerId,
-    });
+    }).populate('customer');
   }
 
   getByCompetenceDate(customerId: String, month: Number, year: Number) {
@@ -29,7 +40,7 @@ class InvoiceRepository extends BaseRepository {
       month,
       year,
       _customerId: customerId,
-    });
+    }).populate('customer');
   }
 
   public async closeOneInvoice(invoice) {
