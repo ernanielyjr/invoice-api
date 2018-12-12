@@ -2,6 +2,9 @@
   "name": "myplan-api",
   "version": "1.0.0",
   "description": "",
+  "engines": {
+    "node": "10.7.0"
+  },
   "main": "src/server.js",
   "scripts": {
     "postinstall": "npm run compile",
