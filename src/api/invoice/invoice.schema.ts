@@ -28,8 +28,8 @@ const invoiceSchema = new mongoose.Schema({
   lastStatus: {
     type: String,
     enum: Object.keys(PagSeguroTransactionStatus).map(key => PagSeguroTransactionStatus[key]),
-    required: [false, 'invoice.lastStatus.required']
-  }
+  },
+  lastStatusTime: Date,
 
 }, {
   timestamps: true,

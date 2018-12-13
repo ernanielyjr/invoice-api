@@ -39,6 +39,25 @@ class EmailService {
     return this.register(customer.emails, subject, body);
   }
 
+  invoiceAwaitingPayment(customer, closedInvoice) {
+    const name = customer.responsibleName || customer.name || 'Cliente';
+    const firstName = name.split(' ')[0];
+    const monthYear = Helper.getMonthYear(closedInvoice.month - 1, closedInvoice.year);
+    const dueDate = Helper.getFormattedDate(customer.invoiceMaturity, closedInvoice.month + 1, closedInvoice.year);
+    const subject = `Pagamento pendente da fatura de ${monthYear}`;
+
+    const body = this.templateService.invoiceAwaitingPayment(
+      subject,
+      firstName,
+      monthYear,
+      dueDate,
+      closedInvoice.amount.toFixed(2),
+      `${AppConfig.emailBaseUrl}/${closedInvoice._id}`
+    );
+
+    return this.register(customer.emails, subject, body);
+  }
+
   invoicePaymentReceived(customer, amount: number) {
     const name = customer.responsibleName || customer.name || 'Cliente';
     const firstName = name.split(' ')[0];
@@ -117,6 +136,17 @@ class TemplateService {
 
   invoiceClosed(subject: string, firstName: string, monthYear: string, dueDate: string, totalAmount: string, paymentLink: string) {
     return this.renderTemplateFile(path.resolve(__dirname, '../../templates/invoice-closed.ejs'), {
+      subject,
+      firstName,
+      monthYear,
+      dueDate,
+      totalAmount,
+      paymentLink,
+    });
+  }
+
+  invoiceAwaitingPayment(subject: string, firstName: string, monthYear: string, dueDate: string, totalAmount: string, paymentLink: string) {
+    return this.renderTemplateFile(path.resolve(__dirname, '../../templates/invoice-awaiting-payment.ejs'), {
       subject,
       firstName,
       monthYear,

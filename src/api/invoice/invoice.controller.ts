@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import CrudController from '../../models/crud.controller';
 import { ErrorMessages, httpStatus, ResponseError, ResponseOk } from '../../models/response.model';
 import CustomerRepository from '../customer/customer.repository';
+import EmailService from '../email/email.service';
 import InvoiceRepository from './invoice.repository';
 
 class InvoiceController extends CrudController {
@@ -86,6 +87,54 @@ class InvoiceController extends CrudController {
     }
   }
 
+  async resendInvoiceEmail(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+
+      const invoice = await InvoiceRepository.get(id);
+
+      if (!invoice) {
+        console.error('INVOICE_NOT_FOUND', id);
+        return new ResponseError(res, ErrorMessages.GENERIC_ERROR);
+      }
+
+      if (!invoice.closed) {
+        console.error('INVOICE_IS_OPEN', invoice);
+        return new ResponseError(res, ErrorMessages.GENERIC_ERROR);
+      }
+
+      if (invoice.paid) {
+        console.error('INVOICE_IS_OPEN', invoice);
+        return new ResponseError(res, ErrorMessages.GENERIC_ERROR);
+      }
+
+      const customer = await CustomerRepository.get(invoice._customerId);
+      if (!customer) {
+        console.error('CUSTOMER_NOT_FOUND', invoice._customerId);
+        return new ResponseError(res, ErrorMessages.GENERIC_ERROR);
+      }
+
+      const invoiceDate = invoice.dueDate;
+      invoiceDate.setHours(0, 0, 0, 0);
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      if (today > invoiceDate) {
+        EmailService.invoiceAwaitingPayment(customer, invoice);
+
+      } else {
+        EmailService.invoiceClosed(customer, invoice);
+      }
+
+      return new ResponseOk(res, null, httpStatus.NO_CONTENT);
+
+    } catch (err) {
+      console.error('INVOICE_RESEND_EMAIL_ERROR', err, req.body);
+      new ResponseError(res, ErrorMessages.GENERIC_ERROR);
+    }
+  }
+
   async closeInvoice(req: Request, res: Response) {
     try {
       const { id } = req.params;
@@ -94,12 +143,12 @@ class InvoiceController extends CrudController {
 
       if (!invoice) {
         console.error('INVOICE_NOT_FOUND', id);
-        new ResponseError(res, ErrorMessages.GENERIC_ERROR);
+        return new ResponseError(res, ErrorMessages.GENERIC_ERROR);
       }
 
       if (invoice.closed) {
         console.error('INVOICE_ALREADY_CLOSED', invoice);
-        new ResponseError(res, ErrorMessages.GENERIC_ERROR);
+        return new ResponseError(res, ErrorMessages.GENERIC_ERROR);
       }
 
       await InvoiceRepository.closeOneInvoice(invoice);

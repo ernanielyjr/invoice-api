@@ -4,6 +4,7 @@ class InvoiceRoutes {
   public config(app): void {
     app.route('/api/v1/invoice/close').get(InvoiceController.closeAllInvoices.bind(InvoiceController));
     app.route('/api/v1/invoice/:id/close').get(InvoiceController.closeInvoice.bind(InvoiceController));
+    app.route('/api/v1/invoice/:id/resend').get(InvoiceController.resendInvoiceEmail.bind(InvoiceController));
     app.route('/api/v1/first-invoice/:customerId').get(InvoiceController.customerFirstInvoice.bind(InvoiceController));
 
     app.route('/api/v1/invoice').get(InvoiceController.get.bind(InvoiceController));
