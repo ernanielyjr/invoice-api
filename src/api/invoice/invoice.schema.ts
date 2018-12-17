@@ -8,7 +8,10 @@ const invoiceSchema = new mongoose.Schema({
     ref: 'Customer',
     required: [true, 'invoice.customer.required']
   },
-  closed: Boolean,
+  closed: {
+    type: Boolean,
+    default: false
+  },
   dueDate: Date,
   month: {
     type: Number,
@@ -24,7 +27,14 @@ const invoiceSchema = new mongoose.Schema({
   amount: Number,
   postings: [PostingSchema],
   paymentCode: String,
-  paid: Boolean, // TODO: ainda faz sentido?
+  paid: {
+    type: Boolean,
+    default: false
+  },
+  deferredPayment: {
+    type: Boolean,
+    default: false
+  },
   lastStatus: {
     type: String,
     enum: Object.keys(PagSeguroTransactionStatus).map(key => PagSeguroTransactionStatus[key]),

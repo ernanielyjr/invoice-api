@@ -45,7 +45,9 @@ class PaymentController {
       invoice.lastStatus = result.status;
       invoice.lastStatusTime = new Date();
       if (!invoice.paid) {
-        invoice.paid = result.status === PagSeguroTransactionStatus.PAGA;
+        const paid = result.status === PagSeguroTransactionStatus.PAGA;
+        invoice.paid = paid;
+        invoice.deferredPayment = !paid;
       }
       await invoice.save();
 

@@ -1,3 +1,4 @@
+import { ObjectID } from 'bson';
 import * as mongoose from 'mongoose';
 import BaseRepository from '../../models/base.respository';
 import PostingType from '../../models/posting-type.enum';
@@ -81,6 +82,34 @@ class InvoiceRepository extends BaseRepository {
 
     } catch (err) {
       console.error('INVOICE_CLOSE_ERROR', err, invoice);
+    }
+
+    try {
+      const lateInvoices = await this.find({
+        _customerId: new ObjectID(invoice._customerId),
+        paid: {
+          $ne: true
+        }, // TODO: mudar para paid: false em mar/2019
+        $or: [{
+          month: {
+            $lt: invoice.month
+          },
+          year: invoice.year
+        }, {
+          year: {
+            $lt: invoice.year
+          }
+        }]
+      });
+
+      for (const lateInvoice of lateInvoices) {
+        lateInvoice.paid = true;
+        lateInvoice.deferredPayment = true;
+        lateInvoice.save();
+      }
+
+    } catch (err) {
+      console.error('INVOICE_UPDATE_LATE', err, invoice);
     }
 
     try {
