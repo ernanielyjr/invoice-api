@@ -55,7 +55,7 @@ class InvoiceRepository extends BaseRepository {
 
     previousBalance = totalIncome + previousBalance;
 
-    if (previousBalance < 0) {
+    if (previousBalance > 0) {
       let charges = Math.round((previousBalance * (0.02 + 0.01)) * 100) / 100;
       if (charges === 0) {
         charges = -0.01;
@@ -76,6 +76,7 @@ class InvoiceRepository extends BaseRepository {
     invoice.dueDate = dueDate;
     invoice.amount = Math.round(totalAmount * 100) / 100;
     invoice.closed = true;
+    invoice.paid = invoice.amount <= 0;
 
     try {
       await invoice.save();

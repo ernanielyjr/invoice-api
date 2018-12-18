@@ -33,7 +33,8 @@ class EmailService {
       monthYear,
       dueDate,
       closedInvoice.amount.toFixed(2),
-      `${AppConfig.emailBaseUrl}/${closedInvoice._id}`
+      `${AppConfig.emailBaseUrl}/${closedInvoice._id}`,
+      closedInvoice.paid
     );
 
     return this.register(customer.emails, subject, body);
@@ -134,13 +135,22 @@ class TemplateService {
     return `<pre>${newContent}</pre><hr />`;
   }
 
-  invoiceClosed(subject: string, firstName: string, monthYear: string, dueDate: string, totalAmount: string, paymentLink: string) {
+  invoiceClosed(
+    subject: string,
+    firstName: string,
+    monthYear: string,
+    dueDate: string,
+    totalAmount: string,
+    paymentLink: string,
+    paid: boolean
+  ) {
     return this.renderTemplateFile(path.resolve(__dirname, '../../templates/invoice-closed.ejs'), {
       subject,
       firstName,
       monthYear,
       dueDate,
       totalAmount,
+      paid,
       paymentLink,
     });
   }
