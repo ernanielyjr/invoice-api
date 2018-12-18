@@ -113,7 +113,7 @@ export class PaymentService {
         receiverEmail: email,
 
         notificationURL: `${AppConfig.apiBaseUrl}/v1/payment/${invoice._id.toString()}/notify`,
-        reference: invoice._id,
+        reference: invoice._id.toString(),
         senderName: customer.name,
         senderAreaCode: phoneAreaCode,
         senderPhone: phoneNumber,
