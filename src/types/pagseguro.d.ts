@@ -76,12 +76,25 @@ declare module 'pagseguro' {
       redirectURL?: string,
       notificationURL?: string,
       sender?: {
+        hash?: string,
+        cpf?: string,
+        cnpj?: string,
         name?: string,
         email: string,
         phone?: {
           areaCode: string,
           number: string,
         },
+        address?: {
+          street: string,
+          number: string,
+          complement?: string,
+          district: string,
+          postalCode: string,
+          city: string,
+          state: string,
+          country: string,
+        }
       },
       items: [{
         item: PagSeguro.Item

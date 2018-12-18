@@ -86,25 +86,14 @@ class PaymentController {
   async pay(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const { force } = req.query;
       const invoice = await InvoiceRepository.get(id);
 
       if (!invoice) {
         return new ResponseError(res, ErrorMessages.ITEM_NOT_FOUND);
       }
 
-      if (force === 'true' || (!invoice.paymentCode && invoice.closed)) {
-        const customer = await CustomerRepository.get(invoice._customerId);
-
-        const payment = new PaymentService();
-        payment.setReference(invoice._id);
-        payment.setCustomer(customer.emails[0], customer.name);
-
-        const monthYear = Helper.getMonthYear(invoice.month - 1, invoice.year);
-
-        payment.addItem(`Fatura de ${monthYear} de ${invoice.year}`, invoice.amount);
-
-        invoice.paymentCode = await payment.getCode();
+      if (!invoice.read) {
+        invoice.read = true;
         await invoice.save();
       }
 
@@ -116,6 +105,93 @@ class PaymentController {
     }
   }
 
+  async billet(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const { senderHash } = req.body;
+      const invoice = await InvoiceRepository.get(id);
+
+      if (!invoice) {
+        return new ResponseError(res, ErrorMessages.ITEM_NOT_FOUND);
+      }
+
+      if (!invoice.closed) {
+        return new ResponseError(res, ErrorMessages.INVOICE_NOT_CLOSED);
+      }
+
+      if (invoice.paid) {
+        return new ResponseError(res, ErrorMessages.INVOICE_ALREADY_PAID);
+      }
+
+      const payment = new PaymentService();
+      const url = await payment.getBillet(invoice, senderHash);
+
+      invoice.paymentData = url;
+      invoice.paymentMode = 'billet';
+      await invoice.save();
+
+      new ResponseOk(res, url);
+
+    } catch (err) {
+      console.error('INVOICE_BILLET', err, req.body);
+
+      if (err && err.type === 'VALIDATION') {
+        return new ResponseError(res, ErrorMessages.INVOICE_BILLET_VALIDATION);
+      }
+
+      return new ResponseError(res, ErrorMessages.GENERIC_ERROR);
+    }
+
+  }
+
+  async sessionId(req: Request, res: Response) {
+    try {
+      const sessionId = await PaymentService.getSessionId();
+      new ResponseOk(res, sessionId);
+
+    } catch (err) {
+      console.error('INVOICE_PAY_CODE', err, req.body);
+      new ResponseError(res, ErrorMessages.GENERIC_ERROR);
+    }
+  }
+
+  async code(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const invoice = await InvoiceRepository.get(id);
+
+      if (!invoice) {
+        return new ResponseError(res, ErrorMessages.ITEM_NOT_FOUND);
+      }
+
+      if (!invoice.closed) {
+        return new ResponseError(res, ErrorMessages.INVOICE_NOT_CLOSED);
+      }
+
+      if (invoice.paid) {
+        return new ResponseError(res, ErrorMessages.INVOICE_ALREADY_PAID);
+      }
+
+      const monthYear = Helper.getMonthYear(invoice.month - 1, invoice.year);
+
+      const payment = new PaymentService();
+      payment.setReference(invoice._id);
+      payment.setCustomer(invoice.customer.emails[0], invoice.customer.name);
+      payment.addItem(`Fatura de ${monthYear} de ${invoice.year}`, invoice.amount);
+
+      const code = await payment.getCode();
+
+      invoice.paymentData = code;
+      invoice.paymentMode = 'normal'; // TODO: fazer enum
+      await invoice.save();
+
+      new ResponseOk(res, code);
+
+    } catch (err) {
+      console.error('INVOICE_PAY_CODE', err, req.body);
+      new ResponseError(res, ErrorMessages.GENERIC_ERROR);
+    }
+  }
 }
 
 export default new PaymentController;

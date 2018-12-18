@@ -157,7 +157,19 @@ export enum PagSeguroTransactionStatus {
 }
 
 export interface PagSeguroNotification {
+  errors: {
+    error: {
+      code: string,
+      message: string
+    }[];
+  };
   transaction: Transaction;
+}
+
+export interface PagSeguroSession {
+  session: {
+    id: string;
+  };
 }
 
 export const paidStatus = [PagSeguroTransactionStatus.PAGA, PagSeguroTransactionStatus.DISPONIVEL];

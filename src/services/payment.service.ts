@@ -1,8 +1,10 @@
 import * as https from 'https';
 import * as PagSeguro from 'pagseguro';
+import * as querystring from 'querystring';
 import * as xml2js from 'xml2js';
 import AppConfig from '../configs/app.config';
-import { PagSeguroNotification, PagSeguroTransactionStatus } from '../models/pagseguro-notification.model';
+import { Helper } from '../helper';
+import { PagSeguroNotification, PagSeguroSession, PagSeguroTransactionStatus } from '../models/pagseguro-notification.model';
 
 export class PaymentService {
   private paymentProvider: PagSeguro;
@@ -20,8 +22,8 @@ export class PaymentService {
   setReference(reference: string): void {
     const code = reference.toString();
     this.paymentProvider.reference(code)
-    .setRedirectURL(`${AppConfig.emailBaseUrl}/${code}`)
-    .setNotificationURL(`${AppConfig.apiBaseUrl}/v1/payment/${code}/notify`);
+      .setRedirectURL(`${AppConfig.emailBaseUrl}/${code}`)
+      .setNotificationURL(`${AppConfig.apiBaseUrl}/v1/payment/${code}/notify`);
   }
 
   setCustomer(email: string, name?: string): void {
@@ -43,6 +45,151 @@ export class PaymentService {
     });
   }
 
+  static async getSessionId(): Promise<string> {
+    const { mode, email, token } = AppConfig.pagSeguro;
+
+    return new Promise<string>((resolve, reject) => {
+      const addUrl = mode === 'sandbox' ? 'sandbox.' : '';
+      const options = {
+        hostname: `ws.${addUrl}pagseguro.uol.com.br`,
+        port: 443,
+        path: `/v2/sessions/?email=${email}&token=${token}`,
+        method: 'POST'
+      };
+
+      const req = https.request(options, (response) => {
+        let data = '';
+        response.on('data', (chunk) => {
+          data += chunk;
+        });
+
+        response.on('end', () => {
+          const parser = new xml2js.Parser({ explicitArray: false });
+          parser.parseString(data, (parseStringError, result: PagSeguroSession) => {
+            if (parseStringError) {
+              return reject(parseStringError);
+            }
+
+            const { session } = result;
+            return resolve(session.id);
+          });
+        });
+
+      });
+
+      req.on('error', err => reject(err));
+      req.end();
+    });
+  }
+
+  async getBillet(invoice: any, senderHash: string): Promise<any> {
+
+    const { mode, email, token } = AppConfig.pagSeguro;
+    const { customer } = invoice;
+
+    let [phone] = customer.phones;
+    phone = phone.replace('+55', '').replace(/\D/g, '');
+    let phoneAreaCode = phone.substr(0, 2);
+    let phoneNumber = phone.substr(2);
+    if (phoneNumber.length < 8) {
+      phoneAreaCode = '51';
+      phoneNumber = phone;
+    }
+
+    const { address } = customer;
+    let customerEmail = customer.emails[0];
+    if (mode === 'sandbox') {
+      customerEmail = customerEmail.replace(/\@.*/g, '@sandbox.pagseguro.com.br');
+    }
+
+    return new Promise((resolve, reject) => {
+      const monthYear = Helper.getMonthYear(invoice.month - 1, invoice.year);
+
+      const data = {
+        senderHash,
+        paymentMode: 'default',
+        paymentMethod: 'boleto',
+        currency: 'BRL',
+        receiverEmail: email,
+
+        notificationURL: `${AppConfig.apiBaseUrl}/v1/payment/${invoice._id.toString()}/notify`,
+        reference: invoice._id,
+        senderName: customer.name,
+        senderAreaCode: phoneAreaCode,
+        senderPhone: phoneNumber,
+        senderEmail: customerEmail,
+
+        shippingAddressStreet: address.street,
+        shippingAddressNumber: address.number,
+        shippingAddressComplement: address.complement,
+        shippingAddressDistrict: address.neighborhood,
+        shippingAddressPostalCode: address.zipCode,
+        shippingAddressCity: address.city,
+        shippingAddressState: address.state,
+        shippingAddressCountry: address.country,
+
+        itemId1: 1,
+        itemDescription1: `Fatura de ${monthYear} de ${invoice.year}`,
+        itemAmount1: Math.abs(invoice.amount).toFixed(2),
+        itemQuantity1: 1,
+      };
+
+      const document = customer.documentNumber.replace(/\D/g, '');
+      if (customer.documentType === 'CPF') {
+        data['senderCPF'] = document;
+
+      } else if (customer.documentType === 'CNPJ') {
+        data['senderCNPJ'] = document;
+      }
+
+      const postData = querystring.stringify(data);
+      const addUrl = mode === 'sandbox' ? 'sandbox.' : '';
+
+      const options = {
+        hostname: `ws.${addUrl}pagseguro.uol.com.br`,
+        port: 443,
+        path: `/v2/transactions/?email=${email}&token=${token}`,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Content-Length': postData.length
+        }
+      };
+
+      const req = https.request(options, (response) => {
+        let data = '';
+        response.on('data', (chunk) => {
+          data += chunk;
+        });
+
+        response.on('end', () => {
+          const parser = new xml2js.Parser({ explicitArray: false });
+          parser.parseString(data, (parseStringError, result: PagSeguroNotification) => {
+            if (parseStringError) {
+              return reject(parseStringError);
+            }
+
+            if (result && result.errors && result.errors.error) {
+              return reject({
+                type: 'VALIDATION',
+                errors: result.errors.error
+              });
+            }
+
+            const { transaction } = result;
+
+            return resolve(transaction.paymentLink);
+          });
+        });
+
+      });
+
+      req.on('error', err => reject(err));
+      req.write(postData);
+      req.end();
+    });
+  }
+
   getCode(): Promise<string> {
     const { obj } = this.paymentProvider;
 
@@ -58,7 +205,7 @@ export class PaymentService {
           return reject(pagSeguroError);
         }
 
-        const parser = new xml2js.Parser({ explicitArray : false });
+        const parser = new xml2js.Parser({ explicitArray: false });
         parser.parseString(pagSeguroResponse, (parseStringError, result: PagSeguro.ResponseBody) => {
           if (parseStringError) {
             return reject(parseStringError);
@@ -88,7 +235,7 @@ export class PaymentService {
         });
 
         response.on('end', () => {
-          const parser = new xml2js.Parser({ explicitArray : false });
+          const parser = new xml2js.Parser({ explicitArray: false });
           parser.parseString(data, (parseStringError, result: PagSeguroNotification) => {
             if (parseStringError) {
               return reject(parseStringError);

@@ -26,7 +26,12 @@ const invoiceSchema = new mongoose.Schema({
   },
   amount: Number,
   postings: [PostingSchema],
-  paymentCode: String,
+  paymentData: String,
+  paymentMode: String,
+  read: {
+    type: Boolean,
+    default: false
+  },
   paid: {
     type: Boolean,
     default: false
