@@ -24,7 +24,7 @@ class EmailService {
     const name = customer.responsibleName || customer.name || 'Cliente';
     const firstName = name.split(' ')[0];
     const monthYear = Helper.getMonthYear(closedInvoice.month - 1, closedInvoice.year);
-    const dueDate = Helper.getFormattedDate(customer.invoiceMaturity, closedInvoice.month + 1, closedInvoice.year);
+    const dueDate = Helper.dateToString(closedInvoice.dueDate);
     const subject = `Sua fatura de ${monthYear} está fechada`;
 
     const body = this.templateService.invoiceClosed(
@@ -44,7 +44,7 @@ class EmailService {
     const name = customer.responsibleName || customer.name || 'Cliente';
     const firstName = name.split(' ')[0];
     const monthYear = Helper.getMonthYear(closedInvoice.month - 1, closedInvoice.year);
-    const dueDate = Helper.getFormattedDate(customer.invoiceMaturity, closedInvoice.month + 1, closedInvoice.year);
+    const dueDate = Helper.dateToString(closedInvoice.dueDate);
     const subject = `Pagamento pendente da fatura de ${monthYear}`;
 
     const body = this.templateService.invoiceAwaitingPayment(

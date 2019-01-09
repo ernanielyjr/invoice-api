@@ -1,6 +1,10 @@
 import Locale from './models/locale.model';
 
 export class Helper {
+  static dateToString(date: Date) {
+    return this.getFormattedDate(date.getDate(), date.getMonth() + 1, date.getFullYear());
+  }
+
   static getFormattedDate(day: number, month: number, year: number): string {
     const dayStr = String(`00${day}`).slice(-2);
     const monthStr = String(`00${month}`).slice(-2);
