@@ -1,5 +1,6 @@
 import { ObjectID } from 'bson';
 import * as mongoose from 'mongoose';
+import { Helper } from '../../helper';
 import BaseRepository from '../../models/base.respository';
 import PostingType from '../../models/posting-type.enum';
 import CustomerRepository from '../customer/customer.repository';
@@ -68,13 +69,13 @@ class InvoiceRepository extends BaseRepository {
       });
     }
 
-    const totalAmount = invoice.postings.reduce((sum, posting) => sum + posting.amount, 0);
+    const totalAmount = Helper.sumPostingsAmount(invoice);
     const customer = await CustomerRepository.get(invoice._customerId);
 
     const dueDate = new Date(invoice.year, invoice.month, customer.invoiceMaturity || 25);
 
     invoice.dueDate = dueDate;
-    invoice.amount = Math.round(totalAmount * 100) / 100;
+    invoice.amount = totalAmount;
     invoice.closed = true;
     invoice.paid = invoice.amount <= 0;
 

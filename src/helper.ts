@@ -11,4 +11,8 @@ export class Helper {
   static getMonthYear(month: number, year: number) {
     return `${Locale.monthNames[month]}/${year}`;
   }
+
+  static sumPostingsAmount(invoice) {
+    return Math.round(invoice.postings.reduce((sum, posting) => sum + posting.amount, 0) * 100) / 100;
+  }
 }

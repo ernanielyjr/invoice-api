@@ -1,80 +1,111 @@
 import { Request, Response } from 'express';
+import { Helper } from '../../helper';
 import { ErrorMessages, httpStatus, ResponseError, ResponseOk } from '../../models/response.model';
+import InvoiceRepository from '../invoice/invoice.repository';
 import PostingRepository from './posting.repository';
 
 class PostingController {
   constructor() { }
 
-  get(req: Request, res: Response) {
+  async get(req: Request, res: Response) {
     const { invoiceId } = req.params;
 
-    PostingRepository.getSubDoc(invoiceId).then((postings) => {
+    try {
+      const postings = await PostingRepository.getSubDoc(invoiceId);
       new ResponseOk(res, postings || []);
 
-    }).catch((err) => {
+    } catch (err) {
       console.error('POSTING_GET_ERROR', err, req.body);
       new ResponseError(res, ErrorMessages.GENERIC_ERROR);
-    });
+    }
   }
 
-  getById(req: Request, res: Response) {
+  async getById(req: Request, res: Response) {
     const { invoiceId, id } = req.params;
 
-    PostingRepository.getSubDoc(invoiceId, id).then((posting) => {
+    try {
+      const posting = await PostingRepository.getSubDoc(invoiceId, id);
       if (posting) {
         new ResponseOk(res, posting);
       } else {
         new ResponseError(res, ErrorMessages.ITEM_NOT_FOUND);
       }
 
-    }).catch((err) => {
+    } catch (err) {
       console.error('POSTING_GET_BY_ID_ERROR', err, req.body);
       new ResponseError(res, ErrorMessages.GENERIC_ERROR);
-    });
+    }
   }
 
-  create(req: Request, res: Response) {
+  async create(req: Request, res: Response) {
     const { invoiceId } = req.params;
 
-    PostingRepository.createSubDoc(invoiceId, req.body).then((posting) => {
+    try {
+      // TODO: nao permitir quando a fatura estiver paga!
+      const posting = await PostingRepository.createSubDoc(invoiceId, req.body);
+
+      const invoice = await InvoiceRepository.get(invoiceId);
+      if (invoice && invoice.closed && invoice.amount) {
+        invoice.amount = Helper.sumPostingsAmount(invoice);
+        await invoice.save();
+      }
+
       new ResponseOk(res, posting, httpStatus.CREATED);
 
-    }).catch((err) => {
+    } catch (err) {
       console.error('POSTING_CREATE_ERROR', err, req.body);
       new ResponseError(res, ErrorMessages.GENERIC_ERROR);
-    });
+    }
   }
 
-  update(req: Request, res: Response) {
+  async update(req: Request, res: Response) {
     const { invoiceId, id } = req.params;
 
-    PostingRepository.updateSubDoc(invoiceId, id, req.body).then((posting) => {
+    try {
+      // TODO: nao permitir quando a fatura estiver paga!
+      const posting = await PostingRepository.updateSubDoc(invoiceId, id, req.body);
       if (posting) {
+        const invoice = await InvoiceRepository.get(invoiceId);
+        if (invoice && invoice.closed && invoice.amount) {
+          invoice.amount = Helper.sumPostingsAmount(invoice);
+          await invoice.save();
+        }
+
         new ResponseOk(res, posting);
+
       } else {
         new ResponseError(res, ErrorMessages.ITEM_NOT_FOUND);
       }
 
-    }).catch((err) => {
+    } catch (err) {
       console.error('POSTING_CREATE_ERROR', err, req.body);
       new ResponseError(res, ErrorMessages.GENERIC_ERROR);
-    });
+    }
   }
 
-  delete(req: Request, res: Response) {
+  async delete(req: Request, res: Response) {
     const { invoiceId, id } = req.params;
 
-    PostingRepository.deleteSubDoc(invoiceId, id).then((posting) => {
+    try {
+      // TODO: nao permitir quando a fatura estiver paga!
+      const posting = await PostingRepository.deleteSubDoc(invoiceId, id);
       if (posting) {
+        const invoice = await InvoiceRepository.get(invoiceId);
+        if (invoice && invoice.closed && invoice.amount) {
+          invoice.amount = Helper.sumPostingsAmount(invoice);
+          await invoice.save();
+        }
+
         new ResponseOk(res, null, httpStatus.NO_CONTENT);
+
       } else {
         new ResponseError(res, ErrorMessages.ITEM_NOT_FOUND);
       }
 
-    }).catch((err) => {
+    } catch (err) {
       console.error('POSTING_DELETE_ERROR', err, req.body);
       new ResponseError(res, ErrorMessages.GENERIC_ERROR);
-    });
+    }
   }
 
 }
