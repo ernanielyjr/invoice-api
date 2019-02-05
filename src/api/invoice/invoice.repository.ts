@@ -47,7 +47,7 @@ class InvoiceRepository extends BaseRepository {
 
   public async closeOneInvoice(invoice) {
     const totalIncome = invoice.postings
-      .filter(posting => posting.amount > 0 && posting.type !== PostingType.balance)
+      .filter(posting => posting.type === PostingType.income)
       .reduce((sum, posting) => sum + posting.amount, 0);
 
     let previousBalance = invoice.postings

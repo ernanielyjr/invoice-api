@@ -124,7 +124,11 @@ class PaymentController {
       }
 
       const payment = new PaymentService();
-      const url = await payment.getBillet(invoice, senderHash);
+      let url = await payment.getBillet(invoice, senderHash);
+
+      if (url) {
+        url = url.replace('print.jhtml', 'print_image.jhtml');
+      }
 
       invoice.paymentData = url;
       invoice.paymentMode = 'billet';

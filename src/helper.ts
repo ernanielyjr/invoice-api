@@ -19,4 +19,8 @@ export class Helper {
   static sumPostingsAmount(invoice) {
     return Math.round(invoice.postings.reduce((sum, posting) => sum + posting.amount, 0) * 100) / 100;
   }
+
+  static normalizeString(str: string) {
+    return str ? str.normalize('NFD').replace(/[\u0300-\u036f]/g, '') : '';
+  }
 }
