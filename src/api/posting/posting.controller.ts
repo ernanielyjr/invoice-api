@@ -44,7 +44,7 @@ class PostingController {
       // TODO: nao permitir quando a fatura estiver paga!
       const posting = await PostingRepository.createSubDoc(invoiceId, req.body);
 
-      const invoice = await InvoiceRepository.get(invoiceId);
+      const invoice = await InvoiceRepository.get({ id: invoiceId });
       if (invoice && invoice.closed && invoice.amount) {
         invoice.amount = Helper.sumPostingsAmount(invoice);
         await invoice.save();
@@ -65,7 +65,7 @@ class PostingController {
       // TODO: nao permitir quando a fatura estiver paga!
       const posting = await PostingRepository.updateSubDoc(invoiceId, id, req.body);
       if (posting) {
-        const invoice = await InvoiceRepository.get(invoiceId);
+        const invoice = await InvoiceRepository.get({ id: invoiceId });
         if (invoice && invoice.closed && invoice.amount) {
           invoice.amount = Helper.sumPostingsAmount(invoice);
           await invoice.save();
@@ -90,7 +90,7 @@ class PostingController {
       // TODO: nao permitir quando a fatura estiver paga!
       const posting = await PostingRepository.deleteSubDoc(invoiceId, id);
       if (posting) {
-        const invoice = await InvoiceRepository.get(invoiceId);
+        const invoice = await InvoiceRepository.get({ id: invoiceId });
         if (invoice && invoice.closed && invoice.amount) {
           invoice.amount = Helper.sumPostingsAmount(invoice);
           await invoice.save();

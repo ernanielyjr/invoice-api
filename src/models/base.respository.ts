@@ -1,5 +1,5 @@
-import * as mongoose from 'mongoose';
 import { ObjectID } from 'bson';
+import * as mongoose from 'mongoose';
 
 export default class BaseRepository {
   public model: mongoose.Model<any>;
@@ -24,11 +24,21 @@ export default class BaseRepository {
     return this.model.find(query).exec();
   }
 
-  get(id?) {
-    if (!id) {
-      return this.model.find().exec();
+  get(filters?: any) {
+    if (!filters.id) {
+      let limit;
+      if (filters.limit) {
+        try {
+          limit = parseInt(filters.limit, 10);
+        } catch (error) {
+          console.error('error', error);
+        }
+      }
+
+      return this.model.find().limit(limit).exec();
     }
-    return this.model.findById(id).exec();
+
+    return this.model.findById(filters.id).exec();
   }
 
   update(id, data) {
@@ -43,23 +53,23 @@ export default class BaseRepository {
 
   // region CRUD SubDoc
   createSubDoc(docId, subDocData) {
-    if (!this.subDocName) { throw('SUB_DOC_NAME_MISSING'); }
+    if (!this.subDocName) { throw ('SUB_DOC_NAME_MISSING'); }
 
     const newData = this.filterInputData(subDocData);
     newData._id = new ObjectID();
 
     return this.model.findById(docId).exec()
-    .then((doc) => {
-      doc[this.subDocName].push(newData);
-      return doc.save()
-      .then((docSaved) => {
-        return this.extractSubDoc(docSaved, newData._id);
+      .then((doc) => {
+        doc[this.subDocName].push(newData);
+        return doc.save()
+          .then((docSaved) => {
+            return this.extractSubDoc(docSaved, newData._id);
+          });
       });
-    });
   }
 
   getSubDoc(docId, subDocId?) {
-    if (!this.subDocName) { throw('SUB_DOC_NAME_MISSING'); }
+    if (!this.subDocName) { throw ('SUB_DOC_NAME_MISSING'); }
 
     let projection = null;
     if (subDocId) {
@@ -75,50 +85,50 @@ export default class BaseRepository {
     return this.model.findOne({
       _id: docId,
     }, projection).exec()
-    .then((res: any) => {
-      if (subDocId) {
-        return res && res.postings ? res.postings[0] : null;
-      }
+      .then((res: any) => {
+        if (subDocId) {
+          return res && res.postings ? res.postings[0] : null;
+        }
 
-      return res ? res.postings : [];
-    });
+        return res ? res.postings : [];
+      });
   }
 
   updateSubDoc(docId, subDocId, subDocData) {
-    if (!this.subDocName) { throw('SUB_DOC_NAME_MISSING'); }
+    if (!this.subDocName) { throw ('SUB_DOC_NAME_MISSING'); }
 
     const newData = this.filterInputData(subDocData);
 
     return this.model.findById(docId).exec()
-    .then((doc) => {
-      const subDocs = doc[this.subDocName];
-      if (!subDocs || !subDocs.length) {
-        return Promise.reject('SUBDOCS_EMPTY');
-      }
+      .then((doc) => {
+        const subDocs = doc[this.subDocName];
+        if (!subDocs || !subDocs.length) {
+          return Promise.reject('SUBDOCS_EMPTY');
+        }
 
-      const subDoc = subDocs.id(subDocId);
-      if (!subDoc) {
-        return Promise.reject('SUBDOC_NOT_EXISTS');
-      }
+        const subDoc = subDocs.id(subDocId);
+        if (!subDoc) {
+          return Promise.reject('SUBDOC_NOT_EXISTS');
+        }
 
-      Object.keys(newData).forEach((dataKey) => {
-        subDoc[dataKey] = newData[dataKey];
+        Object.keys(newData).forEach((dataKey) => {
+          subDoc[dataKey] = newData[dataKey];
+        });
+
+        return doc.save().then((docSaved) => {
+          return this.extractSubDoc(docSaved, subDocId);
+        });
       });
-
-      return doc.save().then((docSaved) => {
-        return this.extractSubDoc(docSaved, subDocId);
-      });
-    });
   }
 
   deleteSubDoc(docId, subDocId) {
-    if (!this.subDocName) { throw('SUB_DOC_NAME_MISSING'); }
+    if (!this.subDocName) { throw ('SUB_DOC_NAME_MISSING'); }
 
     return this.model.findById(docId).exec()
-    .then((doc) => {
-      doc[this.subDocName].id(subDocId).remove();
-      return doc.save();
-    });
+      .then((doc) => {
+        doc[this.subDocName].id(subDocId).remove();
+        return doc.save();
+      });
   }
 
   private extractSubDoc(doc: object, subDocId: string) {

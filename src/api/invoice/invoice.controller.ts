@@ -15,7 +15,7 @@ class InvoiceController extends CrudController {
     try {
       const { customerId } = req.params;
 
-      const customer = await CustomerRepository.get(customerId);
+      const customer = await CustomerRepository.get({ id: customerId });
       if (!customer) {
         console.error('CUSTOMER_NOT_FOUND', customerId);
         return new ResponseError(res, ErrorMessages.GENERIC_ERROR);
@@ -91,7 +91,7 @@ class InvoiceController extends CrudController {
     try {
       const { id } = req.params;
 
-      const invoice = await InvoiceRepository.get(id);
+      const invoice = await InvoiceRepository.get({ id });
 
       if (!invoice) {
         console.error('INVOICE_NOT_FOUND', id);
@@ -108,7 +108,7 @@ class InvoiceController extends CrudController {
         return new ResponseError(res, ErrorMessages.GENERIC_ERROR);
       }
 
-      const customer = await CustomerRepository.get(invoice._customerId);
+      const customer = await CustomerRepository.get({ id: invoice._customerId });
       if (!customer) {
         console.error('CUSTOMER_NOT_FOUND', invoice._customerId);
         return new ResponseError(res, ErrorMessages.GENERIC_ERROR);
@@ -139,7 +139,7 @@ class InvoiceController extends CrudController {
     try {
       const { id } = req.params;
 
-      const invoice = await InvoiceRepository.get(id);
+      const invoice = await InvoiceRepository.get({ id });
 
       if (!invoice) {
         console.error('INVOICE_NOT_FOUND', id);

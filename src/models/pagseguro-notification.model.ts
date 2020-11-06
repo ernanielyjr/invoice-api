@@ -145,6 +145,7 @@ export enum PagSeguroNotificationType {
 }
 
 export enum PagSeguroTransactionStatus {
+  // TODO: quando nao tem nenhum tipo
   AGUARDANDO_PAGAMENTO = '1',
   EM_ANALISE           = '2',
   PAGA                 = '3',

@@ -35,7 +35,7 @@ class PaymentController {
         return new ResponseError(res, ErrorMessages.PAYMENT_DETAIL_INVALID_DATA);
       }
 
-      const invoice = await InvoiceRepository.get(id);
+      const invoice = await InvoiceRepository.get({ id });
 
       if (!invoice) {
         EmailService.adminLog('INVOICE_NOT_FOUND', { params: req.params }, { body: req.body }, { result });
@@ -51,7 +51,7 @@ class PaymentController {
       }
       await invoice.save();
 
-      const customer = await CustomerRepository.get(invoice._customerId);
+      const customer = await CustomerRepository.get({ id: invoice._customerId });
 
       if (result.status !== PagSeguroTransactionStatus.PAGA) {
         EmailService.adminLog('NOT_PAID_STATUS', { params: req.params }, { body: req.body }, { result }, { invoice }, { customer });
@@ -86,7 +86,7 @@ class PaymentController {
   async pay(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const invoice = await InvoiceRepository.get(id);
+      const invoice = await InvoiceRepository.get({ id });
 
       if (!invoice) {
         return new ResponseError(res, ErrorMessages.ITEM_NOT_FOUND);
@@ -109,7 +109,7 @@ class PaymentController {
     try {
       const { id } = req.params;
       const { senderHash } = req.body;
-      const invoice = await InvoiceRepository.get(id);
+      const invoice = await InvoiceRepository.get({ id });
 
       if (!invoice) {
         return new ResponseError(res, ErrorMessages.ITEM_NOT_FOUND);
@@ -162,7 +162,7 @@ class PaymentController {
   async code(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const invoice = await InvoiceRepository.get(id);
+      const invoice = await InvoiceRepository.get({ id });
 
       if (!invoice) {
         return new ResponseError(res, ErrorMessages.ITEM_NOT_FOUND);

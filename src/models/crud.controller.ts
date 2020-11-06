@@ -10,7 +10,8 @@ export default class CrudController {
   }
 
   get(req: Request, res: Response) {
-    this.baseRepository.get().then((items) => {
+    const { limit } = req.query;
+    this.baseRepository.get({ limit }).then((items) => {
       new ResponseOk(res, items || []);
 
     }).catch((err) => {
@@ -22,7 +23,7 @@ export default class CrudController {
   getById(req: Request, res: Response) {
     const { id } = req.params;
 
-    this.baseRepository.get(id).then((item) => {
+    this.baseRepository.get({ id }).then((item) => {
       if (item) {
         new ResponseOk(res, item);
       } else {

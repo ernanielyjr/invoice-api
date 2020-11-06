@@ -70,7 +70,7 @@ class InvoiceRepository extends BaseRepository {
     }
 
     const totalAmount = Helper.sumPostingsAmount(invoice);
-    const customer = await CustomerRepository.get(invoice._customerId);
+    const customer = await CustomerRepository.get({ id: invoice._customerId });
 
     const dueDate = new Date(invoice.year, invoice.month, customer.invoiceMaturity || 25);
 
