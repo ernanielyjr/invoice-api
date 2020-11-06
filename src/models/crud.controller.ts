@@ -11,7 +11,8 @@ export default class CrudController {
 
   get(req: Request, res: Response) {
     const { limit } = req.query;
-    this.baseRepository.get({ limit }).then((items) => {
+
+    this.baseRepository.get(limit ? { limit } : undefined).then((items) => {
       new ResponseOk(res, items || []);
 
     }).catch((err) => {
