@@ -14,6 +14,7 @@ class InvoiceRepository extends BaseRepository {
   }
 
   get(filters?: any) {
+    filters = filters || {};
     if (!filters.id) {
       let limit;
       if (filters.limit) {
