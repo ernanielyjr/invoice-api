@@ -9,11 +9,21 @@ class UserRepository extends BaseRepository {
     super(mongoose.model('User', UserSchema));
   }
 
-  get(id?) {
-    if (!id) {
-      return this.model.find().select('-password').exec();
+  get(filters?: any) {
+    if (!filters.id) {
+      let limit;
+      if (filters.limit) {
+        try {
+          limit = parseInt(filters.limit, 10);
+        } catch (error) {
+          console.error('error', error);
+        }
+      }
+
+      return this.model.find().select('-password').limit(limit).exec();
     }
-    return this.model.findById(id).select('-password').exec();
+
+    return this.model.findById(filters.id).select('-password').exec();
   }
 
   public filterInputData(user) {

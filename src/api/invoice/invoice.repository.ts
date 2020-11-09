@@ -13,11 +13,21 @@ class InvoiceRepository extends BaseRepository {
     super(mongoose.model('Invoice', InvoiceSchema));
   }
 
-  get(id?) {
-    if (!id) {
-      return this.model.find().populate('customer').exec();
+  get(filters?: any) {
+    if (!filters.id) {
+      let limit;
+      if (filters.limit) {
+        try {
+          limit = parseInt(filters.limit, 10);
+        } catch (error) {
+          console.error('error', error);
+        }
+      }
+
+      return this.model.find().populate('customer').limit(limit).exec();
     }
-    return this.model.findById(id).populate('customer').exec();
+
+    return this.model.findById(filters.id).populate('customer').exec();
   }
 
   find(query) {
