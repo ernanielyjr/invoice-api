@@ -14,12 +14,12 @@ class InvoiceRepository extends BaseRepository {
   }
 
   get(filters?: any) {
-    filters = filters || {};
-    if (!filters.id) {
+    const newFilters = filters || {};
+    if (!newFilters.id) {
       let limit;
-      if (filters.limit) {
+      if (newFilters.limit) {
         try {
-          limit = parseInt(filters.limit, 10);
+          limit = parseInt(newFilters.limit, 10);
         } catch (error) {
           console.error('error', error);
         }
@@ -28,7 +28,7 @@ class InvoiceRepository extends BaseRepository {
       return this.model.find().populate('customer').limit(limit).exec();
     }
 
-    return this.model.findById(filters.id).populate('customer').exec();
+    return this.model.findById(newFilters.id).populate('customer').exec();
   }
 
   find(query) {

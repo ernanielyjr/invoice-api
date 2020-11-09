@@ -10,12 +10,12 @@ class UserRepository extends BaseRepository {
   }
 
   get(filters?: any) {
-    filters = filters || {};
-    if (!filters.id) {
+    const newFilters = filters || {};
+    if (!newFilters.id) {
       let limit;
-      if (filters.limit) {
+      if (newFilters.limit) {
         try {
-          limit = parseInt(filters.limit, 10);
+          limit = parseInt(newFilters.limit, 10);
         } catch (error) {
           console.error('error', error);
         }
@@ -24,7 +24,7 @@ class UserRepository extends BaseRepository {
       return this.model.find().select('-password').limit(limit).exec();
     }
 
-    return this.model.findById(filters.id).select('-password').exec();
+    return this.model.findById(newFilters.id).select('-password').exec();
   }
 
   public filterInputData(user) {
