@@ -9,7 +9,8 @@ class DatabaseService {
   createConnection() {
     (<any>mongoose).Promise = global.Promise;
     mongoose.connect(AppConfig.database.uri, {
-      useMongoClient: true
+      useNewUrlParser: true,
+      useUnifiedTopology: true
     });
     this.logger();
   }

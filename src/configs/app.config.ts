@@ -6,7 +6,6 @@ const {
   dbUser,
   dbPass,
   dbHost,
-  dbPort,
   dbName,
   apiBaseUrl,
   adminEmail,
@@ -32,7 +31,7 @@ class Database {
     if (dbUser && dbPass) {
       uriPrefix = `${dbUser}:${dbPass}@`;
     }
-    return `mongodb://${uriPrefix}${dbHost}:${dbPort}/${dbName}`;
+    return `mongodb+srv://${uriPrefix}${dbHost}/${dbName}`;
   }
 }
 
