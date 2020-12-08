@@ -7,6 +7,7 @@
   },
   "main": "src/server.js",
   "scripts": {
+    "postinstall": "npm run compile",
     "start": "npm run serve",
     "serve": "nodemon ./dist/server.js --watch ./dist --watch ./package.json --watch ./.env",
     "compile": "tslint --project ./ && tsc && cp -R ./src/templates ./dist",
@@ -53,6 +54,6 @@
     "ts-node": "^1.7.2",
     "tslint": "^5.10.0",
     "tslint-config-airbnb": "^5.11.0",
-    "typescript": "^4.1.2"
+    "typescript": "^2.0.6"
   }
 }
