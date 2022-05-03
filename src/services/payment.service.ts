@@ -243,6 +243,10 @@ export class PaymentService {
 
             const { transaction } = result;
 
+            if (!transaction) {
+              return reject("TRANSACTION_NOT_FOUND");
+            }
+
             return resolve({
               code: transaction.code,
               reference: transaction.reference,
