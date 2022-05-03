@@ -60,7 +60,7 @@ class PaymentController {
         EmailService.adminLog('NOT_PAID_STATUS', { params: req.params }, { body: req.body }, { result }, { invoice }, { customer });
       }
 
-      if (result.status === PagSeguroTransactionStatus.PAGA) {
+      if (paid) {
         const amount = Number.parseFloat(result.amount);
 
         const openedInvoice = await InvoiceRepository.getOpenedByCustomer(invoice._customerId);
