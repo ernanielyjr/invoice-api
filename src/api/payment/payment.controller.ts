@@ -20,6 +20,8 @@ class PaymentController {
         return new ResponseError(res, ErrorMessages.PAYMENT_DETAIL_INVALID_DATA);
       } */
 
+      const paidStatus = [PagSeguroTransactionStatus.PAGA, PagSeguroTransactionStatus.DISPONIVEL];
+
       const { notificationCode, notificationType } = req.body;
       const { id } = req.params;
 
@@ -44,8 +46,9 @@ class PaymentController {
 
       invoice.lastStatus = result.status;
       invoice.lastStatusTime = new Date();
+      const paid = paidStatus.includes(result.status);
+
       if (!invoice.paid) {
-        const paid = result.status === PagSeguroTransactionStatus.PAGA;
         invoice.paid = paid;
         invoice.deferredPayment = !paid;
       }
@@ -53,7 +56,7 @@ class PaymentController {
 
       const customer = await CustomerRepository.get({ id: invoice._customerId });
 
-      if (result.status !== PagSeguroTransactionStatus.PAGA) {
+      if (!paid) {
         EmailService.adminLog('NOT_PAID_STATUS', { params: req.params }, { body: req.body }, { result }, { invoice }, { customer });
       }
 
