@@ -10,8 +10,6 @@ import {
 } from "../../models/response.model";
 
 class AuthService {
-  constructor() {}
-
   sha512(password: string) {
     const hash = crypto.createHmac("sha512", AppConfig.passKey);
     hash.update(password);

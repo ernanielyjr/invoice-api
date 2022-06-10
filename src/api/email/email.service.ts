@@ -8,8 +8,6 @@ import EmailRepository from "./email.repository";
 class EmailService {
   templateService = new TemplateService();
 
-  constructor() {}
-
   adminLog(label: string, ...data: any[]) {
     console.error(label, data);
     const subject = `LOG MyPlan - ${label}`;

@@ -1,0 +1,5 @@
+{
+  "watch": ["dist", "package.json", ".env"],
+  "ignore": ["src/**/*.spec.ts"],
+  "exec": "node ./dist/server.js"
+}

@@ -4,8 +4,6 @@ import AppConfig from "../configs/app.config";
 class DatabaseService {
   private dbConnection;
 
-  constructor() {}
-
   createConnection() {
     (<any>mongoose).Promise = global.Promise;
     mongoose.connect(AppConfig.database.uri, {

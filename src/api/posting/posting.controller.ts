@@ -10,8 +10,6 @@ import InvoiceRepository from "../invoice/invoice.repository";
 import PostingRepository from "./posting.repository";
 
 class PostingController {
-  constructor() {}
-
   async get(req: Request, res: Response) {
     const { invoiceId } = req.params;
 

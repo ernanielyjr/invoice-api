@@ -9,8 +9,6 @@ import UserRepository from "../user/user.repository";
 import AuthService from "./auth.service";
 
 class AuthController {
-  constructor() {}
-
   login(req: Request, res: Response) {
     UserRepository.findWithPassword(req.body)
       .then((user) => {
