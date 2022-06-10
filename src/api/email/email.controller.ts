@@ -1,22 +1,26 @@
-import { Request, Response } from 'express';
-import * as nodemailer from 'nodemailer';
-import * as Mail from 'nodemailer/lib/mailer';
-import AppConfig from '../../configs/app.config';
-import CrudController from '../../models/crud.controller';
-import { ErrorMessages, httpStatus, ResponseError, ResponseOk } from '../../models/response.model';
-import EmailRepository from './email.repository';
+import { Request, Response } from "express";
+import * as nodemailer from "nodemailer";
+import * as Mail from "nodemailer/lib/mailer";
+import AppConfig from "../../configs/app.config";
+import CrudController from "../../models/crud.controller";
+import {
+  ErrorMessages,
+  httpStatus,
+  ResponseError,
+  ResponseOk,
+} from "../../models/response.model";
+import EmailRepository from "./email.repository";
 
 class EmailController extends CrudController {
-
   private transporter: Mail; // TODO: mudar pra service
   private defaultMessage = {
     from: {
       name: AppConfig.smtp.name,
-      address: AppConfig.smtp.email
+      address: AppConfig.smtp.email,
     },
     replyTo: {
       name: AppConfig.smtp.name,
-      address: AppConfig.smtp.email
+      address: AppConfig.smtp.email,
     },
   };
 
@@ -28,7 +32,7 @@ class EmailController extends CrudController {
       auth: {
         user: AppConfig.smtp.user,
         pass: AppConfig.smtp.pass,
-      }
+      },
     });
   }
 
@@ -43,7 +47,7 @@ class EmailController extends CrudController {
           ...this.defaultMessage,
           to: email.cc,
           subject: email.subject,
-          html: email.body
+          html: email.body,
         };
 
         try {
@@ -54,10 +58,9 @@ class EmailController extends CrudController {
           const savedEmail = await email.save();
 
           sentEmails.push(savedEmail);
-
         } catch (error) {
           errorEmails.push(error);
-          console.error('EMAIL_SEND_ERROR', error);
+          console.error("EMAIL_SEND_ERROR", error);
         }
       }
 
@@ -70,23 +73,22 @@ class EmailController extends CrudController {
       }
 
       return new ResponseOk(res, null);
-
     } catch (err) {
-      console.error('CRUD_GET_ERROR', err, req.body);
+      console.error("CRUD_GET_ERROR", err, req.body);
       return new ResponseError(res, ErrorMessages.GENERIC_ERROR);
     }
   }
 
   listUnsent(req: Request, res: Response) {
-    EmailRepository.listUnsent().then((items) => {
-      new ResponseOk(res, items || []);
-
-    }).catch((err) => {
-      console.error('CRUD_GET_ERROR', err, req.body);
-      new ResponseError(res, ErrorMessages.GENERIC_ERROR);
-    });
+    EmailRepository.listUnsent()
+      .then((items) => {
+        new ResponseOk(res, items || []);
+      })
+      .catch((err) => {
+        console.error("CRUD_GET_ERROR", err, req.body);
+        new ResponseError(res, ErrorMessages.GENERIC_ERROR);
+      });
   }
-
 }
 
-export default new EmailController;
+export default new EmailController();

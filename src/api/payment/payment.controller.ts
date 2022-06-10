@@ -1,15 +1,22 @@
-import { Request, Response } from 'express';
-import { Helper } from '../../helper';
-import { PagSeguroNotificationType, PagSeguroTransactionStatus } from '../../models/pagseguro-notification.model';
-import PostingType from '../../models/posting-type.enum';
-import { ErrorMessages, httpStatus, ResponseError, ResponseOk } from '../../models/response.model';
-import { PaymentService } from '../../services/payment.service';
-import CustomerRepository from '../customer/customer.repository';
-import EmailService from '../email/email.service';
-import InvoiceRepository from '../invoice/invoice.repository';
+import { Request, Response } from "express";
+import { Helper } from "../../helper";
+import {
+  PagSeguroNotificationType,
+  PagSeguroTransactionStatus,
+} from "../../models/pagseguro-notification.model";
+import PostingType from "../../models/posting-type.enum";
+import {
+  ErrorMessages,
+  httpStatus,
+  ResponseError,
+  ResponseOk,
+} from "../../models/response.model";
+import { PaymentService } from "../../services/payment.service";
+import CustomerRepository from "../customer/customer.repository";
+import EmailService from "../email/email.service";
+import InvoiceRepository from "../invoice/invoice.repository";
 
 class PaymentController {
-
   async notify(req: Request, res: Response) {
     try {
       /* TODO: improve this domain origin check
@@ -20,28 +27,51 @@ class PaymentController {
         return new ResponseError(res, ErrorMessages.PAYMENT_DETAIL_INVALID_DATA);
       } */
 
-      const paidStatus = [PagSeguroTransactionStatus.PAGA, PagSeguroTransactionStatus.DISPONIVEL];
+      const paidStatus = [
+        PagSeguroTransactionStatus.PAGA,
+        PagSeguroTransactionStatus.DISPONIVEL,
+      ];
 
       const { notificationCode, notificationType } = req.body;
       const { id } = req.params;
 
       if (notificationType !== PagSeguroNotificationType.TRANSACTION) {
-        EmailService.adminLog('IS_NOT_TRANSACTION_NOTIFICATION', { params: req.params }, { body: req.body });
-        return new ResponseOk(res, 'IS_NOT_TRANSACTION_NOTIFICATION');
+        EmailService.adminLog(
+          "IS_NOT_TRANSACTION_NOTIFICATION",
+          { params: req.params },
+          { body: req.body }
+        );
+        return new ResponseOk(res, "IS_NOT_TRANSACTION_NOTIFICATION");
       }
 
       const result = await PaymentService.getDetail(notificationCode);
 
       if (!result || result.reference !== id) {
-        EmailService.adminLog('INVALID_DATA', { params: req.params }, { body: req.body }, { result });
-        return new ResponseError(res, ErrorMessages.PAYMENT_DETAIL_INVALID_DATA);
+        EmailService.adminLog(
+          "INVALID_DATA",
+          { params: req.params },
+          { body: req.body },
+          { result }
+        );
+        return new ResponseError(
+          res,
+          ErrorMessages.PAYMENT_DETAIL_INVALID_DATA
+        );
       }
 
       const invoice = await InvoiceRepository.get({ id });
 
       if (!invoice) {
-        EmailService.adminLog('INVOICE_NOT_FOUND', { params: req.params }, { body: req.body }, { result });
-        return new ResponseError(res, ErrorMessages.PAYMENT_DETAIL_INVALID_DATA);
+        EmailService.adminLog(
+          "INVOICE_NOT_FOUND",
+          { params: req.params },
+          { body: req.body },
+          { result }
+        );
+        return new ResponseError(
+          res,
+          ErrorMessages.PAYMENT_DETAIL_INVALID_DATA
+        );
       }
 
       invoice.lastStatus = result.status;
@@ -54,23 +84,36 @@ class PaymentController {
       }
       await invoice.save();
 
-      const customer = await CustomerRepository.get({ id: invoice._customerId });
+      const customer = await CustomerRepository.get({
+        id: invoice._customerId,
+      });
 
       if (!paid) {
-        EmailService.adminLog('NOT_PAID_STATUS', { params: req.params }, { body: req.body }, { result }, { invoice }, { customer });
+        EmailService.adminLog(
+          "NOT_PAID_STATUS",
+          { params: req.params },
+          { body: req.body },
+          { result },
+          { invoice },
+          { customer }
+        );
       }
 
       if (paid) {
         const amount = Number.parseFloat(result.amount);
 
-        const openedInvoice = await InvoiceRepository.getOpenedByCustomer(invoice._customerId);
-        const postingPayment = openedInvoice.postings.find(posting => posting.notificationCode === notificationCode);
+        const openedInvoice = await InvoiceRepository.getOpenedByCustomer(
+          invoice._customerId
+        );
+        const postingPayment = openedInvoice.postings.find(
+          (posting) => posting.notificationCode === notificationCode
+        );
 
         if (!postingPayment) {
           openedInvoice.postings.push({
             notificationCode,
             type: PostingType.income,
-            description: 'Pagamento Recebido',
+            description: "Pagamento Recebido",
             amount: -Math.abs(amount),
           });
           await openedInvoice.save();
@@ -81,7 +124,7 @@ class PaymentController {
 
       return new ResponseOk(res, null, httpStatus.NO_CONTENT);
     } catch (err) {
-      console.error('INVOICE_PAY_NOTIFY', err);
+      console.error("INVOICE_PAY_NOTIFY", err);
       new ResponseError(res, ErrorMessages.GENERIC_ERROR);
     }
   }
@@ -101,9 +144,8 @@ class PaymentController {
       }
 
       new ResponseOk(res, invoice);
-
     } catch (err) {
-      console.error('INVOICE_PAY_CODE', err, req.body);
+      console.error("INVOICE_PAY_CODE", err, req.body);
       new ResponseError(res, ErrorMessages.GENERIC_ERROR);
     }
   }
@@ -130,34 +172,31 @@ class PaymentController {
       let url = await payment.getBillet(invoice, senderHash);
 
       if (url) {
-        url = url.replace('print.jhtml', 'print_image.jhtml');
+        url = url.replace("print.jhtml", "print_image.jhtml");
       }
 
       invoice.paymentData = url;
-      invoice.paymentMode = 'billet';
+      invoice.paymentMode = "billet";
       await invoice.save();
 
       new ResponseOk(res, url);
-
     } catch (err) {
-      console.error('INVOICE_BILLET', err, req.body);
+      console.error("INVOICE_BILLET", err, req.body);
 
-      if (err && err.type === 'VALIDATION') {
+      if (err && err.type === "VALIDATION") {
         return new ResponseError(res, ErrorMessages.INVOICE_BILLET_VALIDATION);
       }
 
       return new ResponseError(res, ErrorMessages.GENERIC_ERROR);
     }
-
   }
 
   async sessionId(req: Request, res: Response) {
     try {
       const sessionId = await PaymentService.getSessionId();
       new ResponseOk(res, sessionId);
-
     } catch (err) {
-      console.error('INVOICE_PAY_CODE', err, req.body);
+      console.error("INVOICE_PAY_CODE", err, req.body);
       new ResponseError(res, ErrorMessages.GENERIC_ERROR);
     }
   }
@@ -184,21 +223,23 @@ class PaymentController {
       const payment = new PaymentService();
       payment.setReference(invoice._id);
       payment.setCustomer(invoice.customer.emails[0], invoice.customer.name);
-      payment.addItem(`Fatura de ${monthYear} de ${invoice.year}`, invoice.amount);
+      payment.addItem(
+        `Fatura de ${monthYear} de ${invoice.year}`,
+        invoice.amount
+      );
 
       const code = await payment.getCode();
 
       invoice.paymentData = code;
-      invoice.paymentMode = 'normal'; // TODO: fazer enum
+      invoice.paymentMode = "normal"; // TODO: fazer enum
       await invoice.save();
 
       new ResponseOk(res, code);
-
     } catch (err) {
-      console.error('INVOICE_PAY_CODE', err, req.body);
+      console.error("INVOICE_PAY_CODE", err, req.body);
       new ResponseError(res, ErrorMessages.GENERIC_ERROR);
     }
   }
 }
 
-export default new PaymentController;
+export default new PaymentController();

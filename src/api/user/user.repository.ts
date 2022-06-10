@@ -1,12 +1,11 @@
-import * as mongoose from 'mongoose';
-import BaseRepository from '../../models/base.respository';
-import AuthService from '../auth/auth.service';
-import UserSchema from './user.schema';
+import * as mongoose from "mongoose";
+import BaseRepository from "../../models/base.respository";
+import AuthService from "../auth/auth.service";
+import UserSchema from "./user.schema";
 
 class UserRepository extends BaseRepository {
-
   constructor() {
-    super(mongoose.model('User', UserSchema));
+    super(mongoose.model("User", UserSchema));
   }
 
   get(filters?: any) {
@@ -17,14 +16,14 @@ class UserRepository extends BaseRepository {
         try {
           limit = parseInt(newFilters.limit, 10);
         } catch (error) {
-          console.error('error', error);
+          console.error("error", error);
         }
       }
 
-      return this.model.find().select('-password').limit(limit).exec();
+      return this.model.find().select("-password").limit(limit).exec();
     }
 
-    return this.model.findById(newFilters.id).select('-password').exec();
+    return this.model.findById(newFilters.id).select("-password").exec();
   }
 
   public filterInputData(user) {
@@ -32,7 +31,7 @@ class UserRepository extends BaseRepository {
     const passwordEncrypted = AuthService.sha512(password);
     return {
       username,
-      password: passwordEncrypted
+      password: passwordEncrypted,
     };
   }
 
@@ -40,7 +39,6 @@ class UserRepository extends BaseRepository {
     const newData = this.filterInputData(data);
     return this.model.findOne(newData);
   }
-
 }
 
-export default new UserRepository;
+export default new UserRepository();

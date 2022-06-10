@@ -1,4 +1,4 @@
-import * as dotenv from 'dotenv';
+import * as dotenv from "dotenv";
 
 dotenv.config();
 
@@ -21,13 +21,12 @@ const {
   pagSeguroToken,
   pagSeguroMode,
   pagSeguroNotificationUrl,
-  pagSeguroAllowedOriginUrl
+  pagSeguroAllowedOriginUrl,
 } = process.env;
 
 class Database {
   get uri(): string {
-
-    let uriPrefix = '';
+    let uriPrefix = "";
     if (dbUser && dbPass) {
       uriPrefix = `${dbUser}:${dbPass}@`;
     }
@@ -55,7 +54,7 @@ class AppConfig {
   pagSeguro = {
     email: pagSeguroEmail,
     token: pagSeguroToken,
-    mode: pagSeguroMode as 'payment' | 'sandbox' | 'subscription',
+    mode: pagSeguroMode as "payment" | "sandbox" | "subscription",
     notificationUrl: pagSeguroNotificationUrl,
     allowedOriginUrl: pagSeguroAllowedOriginUrl,
   };

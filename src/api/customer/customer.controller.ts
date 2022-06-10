@@ -1,14 +1,18 @@
-import { Request, Response } from 'express';
-import CrudController from '../../models/crud.controller';
-import PostingType from '../../models/posting-type.enum';
-import RecurrenceType from '../../models/recurrence-type.enum';
-import { ErrorMessages, httpStatus, ResponseError, ResponseOk } from '../../models/response.model';
-import InvoiceRepository from '../invoice/invoice.repository';
-import ServiceRepository from '../service/service.repository';
-import CustomerRepository from './customer.repository';
+import { Request, Response } from "express";
+import CrudController from "../../models/crud.controller";
+import PostingType from "../../models/posting-type.enum";
+import RecurrenceType from "../../models/recurrence-type.enum";
+import {
+  ErrorMessages,
+  httpStatus,
+  ResponseError,
+  ResponseOk,
+} from "../../models/response.model";
+import InvoiceRepository from "../invoice/invoice.repository";
+import ServiceRepository from "../service/service.repository";
+import CustomerRepository from "./customer.repository";
 
 class CustomerController extends CrudController {
-
   constructor() {
     super(CustomerRepository);
   }
@@ -20,12 +24,12 @@ class CustomerController extends CrudController {
         for (const customer of customers) {
           const newCustomer = await CustomerRepository.create({
             responsibleName: customer.responsibleName || customer.name,
-            name:            customer.name || customer.responsibleName,
+            name: customer.name || customer.responsibleName,
             invoiceMaturity: customer.invoiceMaturity || 25,
-            documentNumber:  customer.documentNumber,
-            documentType:    customer.documentType,
-            emails:          customer.emails,
-            phones:          customer.phones,
+            documentNumber: customer.documentNumber,
+            documentType: customer.documentType,
+            emails: customer.emails,
+            phones: customer.phones,
           });
 
           const customerId = newCustomer._id;
@@ -36,11 +40,13 @@ class CustomerController extends CrudController {
               amount: 34.9,
               recurrenceType: RecurrenceType.monthly,
               recurrenceInterval: 1,
-              inactive: false
+              inactive: false,
             });
           }
 
-          const newInvoice = await CustomerRepository.generateFirstInvoice(customerId) as any;
+          const newInvoice = (await CustomerRepository.generateFirstInvoice(
+            customerId
+          )) as any;
           if (customer.postings && customer.postings.length) {
             for (const posting of customer.postings) {
               newInvoice.postings.push({
@@ -56,9 +62,8 @@ class CustomerController extends CrudController {
       }
 
       return new ResponseOk(res, null, httpStatus.NO_CONTENT);
-
     } catch (err) {
-      console.error('CUSTOMER_FIRST_CHARGE', err, req.body);
+      console.error("CUSTOMER_FIRST_CHARGE", err, req.body);
       new ResponseError(res, ErrorMessages.GENERIC_ERROR);
     }
   }
@@ -66,25 +71,27 @@ class CustomerController extends CrudController {
   listServices(req: Request, res: Response) {
     const { id } = req.params;
 
-    ServiceRepository.listByCustomer(id).then((services) => {
-      new ResponseOk(res, services || []);
-
-    }).catch((err) => {
-      console.error('SERVICES_LIST_BY_CUSTOMER_ERROR', err, req.body);
-      new ResponseError(res, ErrorMessages.GENERIC_ERROR);
-    });
+    ServiceRepository.listByCustomer(id)
+      .then((services) => {
+        new ResponseOk(res, services || []);
+      })
+      .catch((err) => {
+        console.error("SERVICES_LIST_BY_CUSTOMER_ERROR", err, req.body);
+        new ResponseError(res, ErrorMessages.GENERIC_ERROR);
+      });
   }
 
   listInvoices(req: Request, res: Response) {
     const { id } = req.params;
 
-    InvoiceRepository.getByCustomer(id).then((invoices) => {
-      new ResponseOk(res, invoices || []);
-
-    }).catch((err) => {
-      console.error('INVOICES_LIST_BY_CUSTOMER_ERROR', err, req.body);
-      new ResponseError(res, ErrorMessages.GENERIC_ERROR);
-    });
+    InvoiceRepository.getByCustomer(id)
+      .then((invoices) => {
+        new ResponseOk(res, invoices || []);
+      })
+      .catch((err) => {
+        console.error("INVOICES_LIST_BY_CUSTOMER_ERROR", err, req.body);
+        new ResponseError(res, ErrorMessages.GENERIC_ERROR);
+      });
   }
 
   currentInvoice(req: Request, res: Response) {
@@ -93,15 +100,15 @@ class CustomerController extends CrudController {
     const baseMonth = baseDate.getMonth() + 1;
     const baseYear = baseDate.getFullYear();
 
-    InvoiceRepository.getByCompetenceDate(id, baseMonth, baseYear).then((currentInvoice) => {
-      new ResponseOk(res, currentInvoice);
-
-    }).catch((err) => {
-      console.error('SERVICES_LIST_BY_CUSTOMER_ERROR', err, req.body);
-      new ResponseError(res, ErrorMessages.GENERIC_ERROR);
-    });
+    InvoiceRepository.getByCompetenceDate(id, baseMonth, baseYear)
+      .then((currentInvoice) => {
+        new ResponseOk(res, currentInvoice);
+      })
+      .catch((err) => {
+        console.error("SERVICES_LIST_BY_CUSTOMER_ERROR", err, req.body);
+        new ResponseError(res, ErrorMessages.GENERIC_ERROR);
+      });
   }
-
 }
 
-export default new CustomerController;
+export default new CustomerController();

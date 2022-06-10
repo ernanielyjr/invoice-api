@@ -1,37 +1,40 @@
-import * as mongoose from 'mongoose';
-import BaseRepository from '../../models/base.respository';
-import PostingType from '../../models/posting-type.enum';
-import InvoiceRepository from '../invoice/invoice.repository';
-import ServiceRepository from '../service/service.repository';
-import CustomerSchema from './customer.schema';
+import * as mongoose from "mongoose";
+import BaseRepository from "../../models/base.respository";
+import PostingType from "../../models/posting-type.enum";
+import InvoiceRepository from "../invoice/invoice.repository";
+import ServiceRepository from "../service/service.repository";
+import CustomerSchema from "./customer.schema";
 
 class CustomerRepository extends BaseRepository {
-
   constructor() {
-    super(mongoose.model('Customer', CustomerSchema));
+    super(mongoose.model("Customer", CustomerSchema));
   }
 
-  public generateNextInvoice(year: number, month: number, customerId: string, amount: number) {
+  public generateNextInvoice(
+    year: number,
+    month: number,
+    customerId: string,
+    amount: number
+  ) {
     return new Promise(async (resolve, reject) => {
-
       const nextInvoiceDate = new Date(year, month, 1);
       const nextInvoice = {
         month: nextInvoiceDate.getMonth() + 1,
         year: nextInvoiceDate.getFullYear(),
         _customerId: customerId,
         closed: false,
-        postings: []
+        postings: [],
       };
 
       nextInvoice.postings.push({
         amount,
         type: PostingType.balance,
-        description: 'Saldo da Fatura Anterior',
+        description: "Saldo da Fatura Anterior",
       });
 
       const customerServices = await ServiceRepository.find({
         _customerId: customerId,
-        inactive: false
+        inactive: false,
       });
 
       customerServices.forEach((service) => {
@@ -47,9 +50,8 @@ class CustomerRepository extends BaseRepository {
       try {
         const newInvoice = await InvoiceRepository.create(nextInvoice);
         resolve(newInvoice);
-
       } catch (err) {
-        console.error('INVOICE_OPEN_ERROR', err, nextInvoice);
+        console.error("INVOICE_OPEN_ERROR", err, nextInvoice);
         reject(nextInvoice);
       }
     });
@@ -62,7 +64,6 @@ class CustomerRepository extends BaseRepository {
 
     return await this.generateNextInvoice(baseYear, baseMonth, customerId, 0);
   }
-
 }
 
-export default new CustomerRepository;
+export default new CustomerRepository();

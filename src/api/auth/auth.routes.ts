@@ -1,11 +1,14 @@
-import AuthController from './auth.controller';
+import AuthController from "./auth.controller";
 
 class AuthRoutes {
-  public authRegExp = /^\/api\/v\d+\/(authenticate|payment\/.+|email\/send-all)$/;
+  public authRegExp =
+    /^\/api\/v\d+\/(authenticate|payment\/.+|email\/send-all)$/;
 
   public config(app): void {
-    app.route('/api/v1/authenticate').post(AuthController.login.bind(AuthController));
+    app
+      .route("/api/v1/authenticate")
+      .post(AuthController.login.bind(AuthController));
   }
 }
 
-export default new AuthRoutes;
+export default new AuthRoutes();

@@ -1,7 +1,7 @@
 enum RecurrenceType {
-  monthly   = 'monthly',
-  quarterly = 'quarterly',
-  yearly    = 'yearly',
+  monthly = "monthly",
+  quarterly = "quarterly",
+  yearly = "yearly",
 }
 
 export default RecurrenceType;

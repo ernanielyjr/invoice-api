@@ -1,12 +1,10 @@
-import CrudController from '../../models/crud.controller';
-import ServiceRepository from './service.repository';
+import CrudController from "../../models/crud.controller";
+import ServiceRepository from "./service.repository";
 
 class ServiceController extends CrudController {
-
   constructor() {
     super(ServiceRepository);
   }
-
 }
 
-export default new ServiceController;
+export default new ServiceController();

@@ -1,11 +1,16 @@
-import { Request, Response } from 'express';
-import { Helper } from '../../helper';
-import { ErrorMessages, httpStatus, ResponseError, ResponseOk } from '../../models/response.model';
-import InvoiceRepository from '../invoice/invoice.repository';
-import PostingRepository from './posting.repository';
+import { Request, Response } from "express";
+import { Helper } from "../../helper";
+import {
+  ErrorMessages,
+  httpStatus,
+  ResponseError,
+  ResponseOk,
+} from "../../models/response.model";
+import InvoiceRepository from "../invoice/invoice.repository";
+import PostingRepository from "./posting.repository";
 
 class PostingController {
-  constructor() { }
+  constructor() {}
 
   async get(req: Request, res: Response) {
     const { invoiceId } = req.params;
@@ -13,9 +18,8 @@ class PostingController {
     try {
       const postings = await PostingRepository.getSubDoc(invoiceId);
       new ResponseOk(res, postings || []);
-
     } catch (err) {
-      console.error('POSTING_GET_ERROR', err, req.body);
+      console.error("POSTING_GET_ERROR", err, req.body);
       new ResponseError(res, ErrorMessages.GENERIC_ERROR);
     }
   }
@@ -30,9 +34,8 @@ class PostingController {
       } else {
         new ResponseError(res, ErrorMessages.ITEM_NOT_FOUND);
       }
-
     } catch (err) {
-      console.error('POSTING_GET_BY_ID_ERROR', err, req.body);
+      console.error("POSTING_GET_BY_ID_ERROR", err, req.body);
       new ResponseError(res, ErrorMessages.GENERIC_ERROR);
     }
   }
@@ -51,9 +54,8 @@ class PostingController {
       }
 
       new ResponseOk(res, posting, httpStatus.CREATED);
-
     } catch (err) {
-      console.error('POSTING_CREATE_ERROR', err, req.body);
+      console.error("POSTING_CREATE_ERROR", err, req.body);
       new ResponseError(res, ErrorMessages.GENERIC_ERROR);
     }
   }
@@ -63,7 +65,11 @@ class PostingController {
 
     try {
       // TODO: nao permitir quando a fatura estiver paga!
-      const posting = await PostingRepository.updateSubDoc(invoiceId, id, req.body);
+      const posting = await PostingRepository.updateSubDoc(
+        invoiceId,
+        id,
+        req.body
+      );
       if (posting) {
         const invoice = await InvoiceRepository.get({ id: invoiceId });
         if (invoice && invoice.closed && invoice.amount) {
@@ -72,13 +78,11 @@ class PostingController {
         }
 
         new ResponseOk(res, posting);
-
       } else {
         new ResponseError(res, ErrorMessages.ITEM_NOT_FOUND);
       }
-
     } catch (err) {
-      console.error('POSTING_CREATE_ERROR', err, req.body);
+      console.error("POSTING_CREATE_ERROR", err, req.body);
       new ResponseError(res, ErrorMessages.GENERIC_ERROR);
     }
   }
@@ -97,17 +101,14 @@ class PostingController {
         }
 
         new ResponseOk(res, null, httpStatus.NO_CONTENT);
-
       } else {
         new ResponseError(res, ErrorMessages.ITEM_NOT_FOUND);
       }
-
     } catch (err) {
-      console.error('POSTING_DELETE_ERROR', err, req.body);
+      console.error("POSTING_DELETE_ERROR", err, req.body);
       new ResponseError(res, ErrorMessages.GENERIC_ERROR);
     }
   }
-
 }
 
-export default new PostingController;
+export default new PostingController();

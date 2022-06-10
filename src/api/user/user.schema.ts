@@ -1,11 +1,13 @@
-import * as mongoose from 'mongoose';
+import * as mongoose from "mongoose";
 
-export default new mongoose.Schema({
-  username: { type: String },
-  password: { type: String },
-
-}, {
-  timestamps: true,
-  usePushEach: true,
-  versionKey: false
-});
+export default new mongoose.Schema(
+  {
+    username: { type: String },
+    password: { type: String },
+  },
+  {
+    timestamps: true,
+    usePushEach: true,
+    versionKey: false,
+  }
+);

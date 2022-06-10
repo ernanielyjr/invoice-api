@@ -1,9 +1,9 @@
-import * as bodyParser from 'body-parser';
-import * as cors from 'cors';
-import * as express from 'express';
-import AuthService from './api/auth/auth.service';
-import Routes from './routes';
-import DatabaseService from './services/database.service';
+import * as bodyParser from "body-parser";
+import * as cors from "cors";
+import * as express from "express";
+import AuthService from "./api/auth/auth.service";
+import Routes from "./routes";
+import DatabaseService from "./services/database.service";
 
 class App {
   public app: express.Application;
@@ -26,10 +26,17 @@ class App {
 
   enableCors() {
     const options: cors.CorsOptions = {
-      allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'X-Access-Token', 'Authorization'],
+      allowedHeaders: [
+        "Origin",
+        "X-Requested-With",
+        "Content-Type",
+        "Accept",
+        "X-Access-Token",
+        "Authorization",
+      ],
       credentials: true,
-      methods: 'GET,HEAD,OPTIONS,PUT,PATCH,POST,DELETE',
-      origin: '*',
+      methods: "GET,HEAD,OPTIONS,PUT,PATCH,POST,DELETE",
+      origin: "*",
       preflightContinue: false,
     };
 
@@ -39,7 +46,6 @@ class App {
   closedataBaseConnection(message, callback) {
     this.database.closeConnection(message, () => callback());
   }
-
 }
 
 export default new App();
