@@ -42,7 +42,7 @@ const invoiceSchema = new mongoose.Schema({
   },
   lastStatus: {
     type: String,
-    enum: Object.keys(PagSeguroTransactionStatus).map(key => PagSeguroTransactionStatus[key]),
+    enum: [null, ...Object.keys(PagSeguroTransactionStatus).map(key => PagSeguroTransactionStatus[key])],
   },
   lastStatusTime: Date,
 
