@@ -1,8 +1,9 @@
 import App from "./app";
+import AppConfig from "./configs/app.config";
 
 const port = process.env.PORT || "8080";
 
-App.app.listen(port, () => console.log(`server running in ${port}`));
+App.app.listen(port, () => console.log(`server running in ${port}`, AppConfig));
 
 process.once("SIGUSR2", () =>
   App.closedataBaseConnection("nodemon restart", () =>

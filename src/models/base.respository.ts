@@ -1,5 +1,5 @@
 import { ObjectID } from "bson";
-import * as mongoose from "mongoose";
+import mongoose from "mongoose";
 
 export default class BaseRepository {
   public model: mongoose.Model<any>;

@@ -1,12 +1,9 @@
-import * as dotenv from "dotenv";
+import dotenv from "dotenv";
 
 dotenv.config();
 
 const {
-  dbUser,
-  dbPass,
-  dbHost,
-  dbName,
+  dbUrl,
   apiBaseUrl,
   adminEmail,
   emailBaseUrl,
@@ -24,16 +21,6 @@ const {
   pagSeguroAllowedOriginUrl,
 } = process.env;
 
-class Database {
-  get uri(): string {
-    let uriPrefix = "";
-    if (dbUser && dbPass) {
-      uriPrefix = `${dbUser}:${dbPass}@`;
-    }
-    return `mongodb+srv://${uriPrefix}${dbHost}/${dbName}`;
-  }
-}
-
 class AppConfig {
   apiBaseUrl = apiBaseUrl;
   adminEmail = adminEmail;
@@ -46,7 +33,7 @@ class AppConfig {
     email: smtpEmail,
   };
   passKey = appPassKey;
-  database = new Database();
+  database = { url: dbUrl };
   jwt = {
     secret: jwtSecret,
     expiration: 24 * 60 * 60,

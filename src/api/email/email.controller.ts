@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import * as nodemailer from "nodemailer";
-import * as Mail from "nodemailer/lib/mailer";
+import nodemailer from "nodemailer";
+import Mail from "nodemailer/lib/mailer";
 import AppConfig from "../../configs/app.config";
 import CrudController from "../../models/crud.controller";
 import {

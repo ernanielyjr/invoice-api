@@ -1,4 +1,4 @@
-import * as mongoose from "mongoose";
+import mongoose from "mongoose";
 import { PagSeguroTransactionStatus } from "../../models/pagseguro-notification.model";
 import PostingSchema from "../posting/posting.schema";
 

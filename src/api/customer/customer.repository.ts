@@ -1,4 +1,4 @@
-import * as mongoose from "mongoose";
+import mongoose from "mongoose";
 import BaseRepository from "../../models/base.respository";
 import PostingType from "../../models/posting-type.enum";
 import InvoiceRepository from "../invoice/invoice.repository";

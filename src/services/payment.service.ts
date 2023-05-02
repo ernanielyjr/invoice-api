@@ -1,7 +1,7 @@
-import * as https from "https";
-import * as PagSeguro from "pagseguro";
-import * as querystring from "querystring";
-import * as xml2js from "xml2js";
+import https from "https";
+import PagSeguro from "pagseguro";
+import querystring from "querystring";
+import xml2js from "xml2js";
 import AppConfig from "../configs/app.config";
 import { Helper } from "../helper";
 import {

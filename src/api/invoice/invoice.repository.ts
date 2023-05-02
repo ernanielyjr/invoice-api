@@ -1,5 +1,5 @@
 import { ObjectID } from "bson";
-import * as mongoose from "mongoose";
+import mongoose from "mongoose";
 import { Helper } from "../../helper";
 import BaseRepository from "../../models/base.respository";
 import PostingType from "../../models/posting-type.enum";

@@ -1,5 +1,5 @@
 import { Response } from "express";
-import * as HttpStatus from "http-status";
+import HttpStatus from "http-status";
 
 export const httpStatus = HttpStatus;
 

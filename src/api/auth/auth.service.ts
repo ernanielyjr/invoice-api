@@ -1,6 +1,6 @@
-import * as crypto from "crypto";
+import crypto from "crypto";
 import { NextFunction, Request, Response } from "express";
-import * as jwt from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import AppConfig from "../../configs/app.config";
 import AuthRoutes from "./auth.routes";
 import {

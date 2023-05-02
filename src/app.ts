@@ -1,6 +1,6 @@
-import * as bodyParser from "body-parser";
-import * as cors from "cors";
-import * as express from "express";
+import cors from "cors";
+import express, { json, urlencoded } from "express";
+import morgan from "morgan";
 import AuthService from "./api/auth/auth.service";
 import Routes from "./routes";
 import DatabaseService from "./services/database.service";
@@ -14,9 +14,10 @@ class App {
     this.app = express();
     this.enableCors();
 
+    this.app.use(morgan("dev"));
     this.app.use(this.enableCors());
-    this.app.use(bodyParser.json());
-    this.app.use(bodyParser.urlencoded({ extended: false }));
+    this.app.use(json());
+    this.app.use(urlencoded({ extended: false }));
     this.app.use(AuthService.validate);
 
     this.database.createConnection();
@@ -43,7 +44,7 @@ class App {
     return cors(options);
   }
 
-  closedataBaseConnection(message, callback) {
+  closedataBaseConnection(message: string, callback: () => void) {
     this.database.closeConnection(message, () => callback());
   }
 }

@@ -1,6 +1,6 @@
-import * as ejs from "ejs";
-import * as fs from "fs";
-import * as path from "path";
+import ejs from "ejs";
+import fs from "fs";
+import path from "path";
 import AppConfig from "../../configs/app.config";
 import { Helper } from "../../helper";
 import EmailRepository from "./email.repository";

@@ -1,4 +1,4 @@
-import * as mongoose from "mongoose";
+import mongoose from "mongoose";
 import BaseRepository from "../../models/base.respository";
 import AuthService from "../auth/auth.service";
 import UserSchema from "./user.schema";

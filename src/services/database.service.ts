@@ -1,4 +1,4 @@
-import * as mongoose from "mongoose";
+import mongoose from "mongoose";
 import AppConfig from "../configs/app.config";
 
 class DatabaseService {
@@ -6,7 +6,7 @@ class DatabaseService {
 
   createConnection() {
     (<any>mongoose).Promise = global.Promise;
-    mongoose.connect(AppConfig.database.uri, {
+    mongoose.connect(AppConfig.database.url, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
@@ -16,13 +16,13 @@ class DatabaseService {
   logger() {
     this.dbConnection = mongoose.connection;
     this.dbConnection.on("connected", () =>
-      console.log(`Mongose is connected in ${AppConfig.database.uri}`)
+      console.log(`Mongose is connected in ${AppConfig.database.url}`)
     );
     this.dbConnection.on("error", (error) =>
       console.error("Connection Error:", error)
     );
     this.dbConnection.on("disconnected", () =>
-      console.log(`Mongose is disconnected in ${AppConfig.database.uri}`)
+      console.log(`Mongose is disconnected in ${AppConfig.database.url}`)
     );
   }
 
