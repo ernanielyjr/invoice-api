@@ -76,9 +76,11 @@ class PaymentController {
 
       invoice.lastStatus = result.status;
       invoice.lastStatusTime = new Date();
-      const paid = paidStatus.includes(result.status);
 
-      if (!invoice.paid) {
+      const paid = paidStatus.includes(result.status);
+      const alreadyPaid = invoice.paid;
+
+      if (!alreadyPaid) {
         invoice.paid = paid;
         invoice.deferredPayment = !paid;
       }
@@ -99,7 +101,7 @@ class PaymentController {
         );
       }
 
-      if (paid) {
+      if (!alreadyPaid && paid) {
         const amount = Number.parseFloat(result.amount);
 
         const openedInvoice = await InvoiceRepository.getOpenedByCustomer(
