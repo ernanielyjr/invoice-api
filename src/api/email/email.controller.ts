@@ -13,10 +13,10 @@ import EmailRepository from "./email.repository";
 
 class EmailController extends CrudController {
   private transporter: Mail; // TODO: mudar pra service
-  private defaultMessage = {
+  private defaultMessage: Mail.Options = {
     from: {
       name: AppConfig.smtp.name,
-      address: AppConfig.smtp.email,
+      address: AppConfig.smtp.user,
     },
     replyTo: {
       name: AppConfig.smtp.name,
@@ -32,6 +32,10 @@ class EmailController extends CrudController {
       auth: {
         user: AppConfig.smtp.user,
         pass: AppConfig.smtp.pass,
+      },
+      from: {
+        name: AppConfig.smtp.name,
+        address: AppConfig.smtp.user,
       },
     });
   }
